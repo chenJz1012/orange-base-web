@@ -253,7 +253,7 @@ Tiles(new in v1.1.1)
     background-color: #8ec127 !important;
 }
 
-.bg-dark-gree {
+.bg-dark-green {
     background-color: #00aba9 !important;
 }
 
@@ -263,4 +263,8 @@ Tiles(new in v1.1.1)
 
 .bg-yellow {
     background-color: #f4d03f !important;
+}
+
+.bg-grey {
+    background-color: #ddd !important;
 }

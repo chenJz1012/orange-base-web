@@ -8,52 +8,37 @@
     String.prototype.startWith = function (s) {
         if (s == null || s == "" || this.length == 0 || s.length > this.length)
             return false;
-        if (this.substr(0, s.length) == s)
-            return true;
-        else
-            return false;
-        return true;
-    }
+        return this.substr(0, s.length) == s;
+    };
     String.prototype.endWith = function (s) {
         if (s == null || s == "" || this.length == 0 || s.length > this.length)
             return false;
-        if (this.substring(this.length - s.length) == s)
-            return true;
-        else
-            return false;
-        return true;
-    }
+        return this.substring(this.length - s.length) == s;
+    };
     var getSimplePath = function (path) {
-
         return path;
-    }
+    };
     var getPrefix = function (name) {
         return name.substring(name.lastIndexOf(".") + 1).toLowerCase();
-    }
+    };
     var getWithoutPrefix = function (name) {
         return name.substring(0, name.lastIndexOf("."));
-    }
+    };
     var getShortName = function (name) {
         return name.substring(0, (name.length > 15 ? 15 : name.length)) + (name.length > 15 ? "..." : "");
-    }
+    };
     var FileManager = function (element, options) {
         options = options || {};
         this.$element = $(element);
         this.options = $.extend(true, {}, FileManager.default, options);
-        this.$pathNav;
-        this.pathNavArray;
-        this.currentFolder;
-        this.contextMenu;
-        this.currentPath;
         if (!this.validate()) {
             return;
         }
         this.init();
         return this;
-    }
+    };
 
     FileManager.default = {
-        "rootPath": "",
         "currentPath": "",
         "height": 500,
         "useContextMenu": true,
@@ -61,36 +46,36 @@
     };
 
     FileManager.url = {
-        folder: "./folder",
-        createFolder: "./createFolder",
-        rename: "./rename",
-        deleteFile: "./deleteFile",
-        deleteFolder: "./deleteFolder",
-        download: "./download",
-        zip: "./zip",
-        unCompress: "./unCompress"
-    }
+        folder: App.href + "/api/fileManager/files",
+        createFolder: App.href + "/api/fileManager/createFolder",
+        rename: App.href + "/api/fileManager/rename",
+        deleteFile: App.href + "/api/fileManager/deleteFile",
+        deleteFolder: App.href + "/api/fileManager/deleteFolder",
+        download: App.href + "/api/fileManager/download",
+        zip: App.href + "/api/fileManager/zip",
+        unCompress: App.href + "/api/fileManager/unCompress"
+    };
 
     FileManager.tpl = {
         pathNav: {
-            ul: '<ul class="page-breadcrumb breadcrumb"></ul>',
-            li: '<li><a href="javascript:void(0);"><font style="font-size:20px;font-family: Arial, Helvetica, sans-serif;">${nav_}</font></a><i style="font-size: 20px;" class="fa fa-angle-right"></i></li>',
-            rootNavLi: '<li><a href="javascript:void(0);"><font style="font-size:20px;font-family: Arial, Helvetica, sans-serif;">资源根目录</font></a><i style="font-size: 20px;" class="fa fa-angle-right"></i></li>'
+            ul: '<ul class="breadcrumb" style="background: none"></ul>',
+            li: '<li><a href="javascript:void(0);"><font style="font-size:20px;font-family: Arial, Helvetica, sans-serif;">${nav_}</font></a></li>',
+            rootNavLi: '<li><a href="javascript:void(0);"><font style="font-size:20px;font-family: Arial, Helvetica, sans-serif;">资源根目录</font></a></li>'
         },
         Folder: {
             container: '<div class="tiles"></div>',
-            folder: '<div class="tile bg-yellow-saffron">' +
+            folder: '<div class="tile bg-yellow">' +
             '<div class="tile-body"><i class="fa fa-folder-open-o"></i></div>' +
             '<div class="tile-object"><div class="name">返回</div></div>' +
             '</div>'
         },
         File: {
-            file: '<div class="tile bg-red-sunglo" title="${title_}">' +
+            file: '<div class="tile bg-grey" title="${title_}">' +
             '<div class="tile-body"> <i class="fa ${icon_}"></i> </div> ' +
             '<div class="tile-object"> <div class="name">${name_} </div></div> ' +
             '</div>',
-            folder: '<div class="tile bg-yellow-saffron" title="${title_}">' +
-            '<div class="tile-body"> <i class="fa icon-folder"></i> </div> ' +
+            folder: '<div class="tile bg-yellow" title="${title_}">' +
+            '<div class="tile-body"> <i class="fa fa-folder-o"></i> </div> ' +
             '<div class="tile-object"> <div class="name">${name_} </div></div> ' +
             '</div>'
         },
@@ -102,12 +87,11 @@
             fileAndFolder: '<li class="file folder"><a href="javascript:void(0);"><i class="${icon_}"></i> <span>${text_}</span> </a></li>',
             desk: '<li class="desk"><a href="javascript:void(0);"><i class="${icon_}"></i> <span>${text_}</span> </a></li>'
         }
-    }
+    };
 
     FileManager.prototype = {
         constructor: FileManager,
         validate: function () {
-            this.rootPath = this.options.rootPath;
             this.currentPath = this.options.currentPath;
             return true;
         },
@@ -132,7 +116,7 @@
             rootNavLi.data("path", "");
             navUl.append(rootNavLi);
             if (path == "") {
-                rootNavLi.find("i").remove()
+                rootNavLi.find("i").remove();
                 return navUl;
             }
             this.pathNavArray = path.split("/");
@@ -154,7 +138,6 @@
             return new Folder(currentPath, this);
         },
         enterFolder: function (targetPath) {
-            targetPath = "" + targetPath;
             this.currentPath = targetPath;
             this.$pathNav.remove();
             this.$pathNav = this.getPathNav(targetPath).hide();
@@ -176,15 +159,11 @@
             this.render();
             this.listen();
         }
-    }
+    };
 
     var Folder = function (currentPath, manager) {
         this.manager = manager;
-        this.$element;
-        this.parentPath;
-        this.name;
         this.currentPath = getSimplePath(currentPath);
-        this.rootPath = manager.rootPath;
         if (this.currentPath.indexOf("/") != -1) {
             this.parentPath = currentPath.substring(0, currentPath.lastIndexOf("/"));
             this.name = currentPath.substring(currentPath.lastIndexOf("/") + 1);
@@ -192,11 +171,10 @@
             this.parentPath = "";
             this.name = this.currentPath;
         }
-        this.$returnFolder;
         this.files = [];
         this.init();
         return this;
-    }
+    };
 
     Folder.prototype = {
         constructor: Folder,
@@ -212,33 +190,38 @@
                 this.$returnFolder = $.tmpl(FileManager.tpl.Folder.folder);
                 this.$element.append(this.$returnFolder);
             }
-            Metronic.blockUI({
-                target: that.manager.$element
-            });
             this.files = [];
+            $.blockUI();
             //load files
             $.ajax({
                 type: "POST",
                 dataType: "json",
                 url: FileManager.url.folder,
+                beforeSend: function (request) {
+                    request.setRequestHeader("X-Auth-Token", App.token);
+                },
                 data: {
-                    "rootPath": this.rootPath,
-                    "targetPath": this.currentPath
+                    "path": this.currentPath
                 },
                 success: function (data) {
-                    if (data.length > 0) {
-                        $.each(data, function (i, file) {
-                            var f = new File(file, that);
-                            that.$element.append(f.$element);
-                            that.files.push(f);
-                        });
+                    if (data.code === 200) {
+                        that.currentPath = data.data.currentDirPath;
+                        if (data.data.files != undefined && data.data.files.length > 0) {
+                            $.each(data.data.files, function (i, file) {
+                                var f = new File(file, that);
+                                that.$element.append(f.$element);
+                                that.files.push(f);
+                            });
+                        }
+                    } else {
+                        alert(data.message);
                     }
-                    Metronic.unblockUI(that.manager.$element);
+                    $.unblockUI();
                 }
             });
         },
-        enterSubFolder: function (subfolderName) {
-            this.manager.enterFolder(this.currentPath + "/" + subfolderName)
+        enterSubFolder: function (subFolderName) {
+            this.manager.enterFolder(this.currentPath + subFolderName)
         },
         returnParent: function () {
             this.manager.enterFolder(this.parentPath);
@@ -263,7 +246,7 @@
         listen: function () {
             var that = this;
             if (this.currentPath != "") {
-                this.$returnFolder.on("click", $.proxy(this.returnParent, this));
+                this.$returnFolder.on("dblclick", $.proxy(this.returnParent, this));
             }
         },
         createFolder: function () {
@@ -287,7 +270,7 @@
                     "zipName": zipName
                 },
                 success: function (data) {
-                    if (data.status == 1) {
+                    if (data.code === 200) {
                         that.refresh();
                     }
                 }
@@ -296,17 +279,16 @@
         refresh: function () {
             this.manager.enterFolder(this.currentPath);
         }
-    }
+    };
 
     var File = function (data, folder) {
         this.folder = folder;
-        this.$element;
         this.data = data;
         this.name = this.data.name;
-        this.isDirectory = this.data.isDirectory
+        this.isDirectory = this.data.isDirectory;
         this.init();
         return this;
-    }
+    };
 
     File.icon = {
         ico: "fa-file-image-o",
@@ -323,7 +305,7 @@
         html: "fa-file-text",
         xml: "fa-file-text",
         jsp: "fa-file-text"
-    }
+    };
 
     File.prototype = {
         constructor: FileManager,
@@ -334,17 +316,16 @@
         render: function () {
             var that = this;
             if (this.isDirectory) {
-                var folder = $.tmpl(FileManager.tpl.File.folder, {
+                this.$element = $.tmpl(FileManager.tpl.File.folder, {
                     "name_": getShortName(this.data.name),
-                    "title_": this.data.name,
+                    "title_": this.data.name
                 });
-                this.$element = folder;
             } else {
-                var profix = getPrefix(this.data.name);
+                var prefix = getPrefix(this.data.name);
                 this.$element = $.tmpl(FileManager.tpl.File.file, {
                     "name_": getShortName(this.data.name),
                     "title_": this.data.name,
-                    "icon_": File.icon[profix] == undefined ? "fa-file-o" : File.icon[profix]
+                    "icon_": File.icon[prefix] == undefined ? "fa-file-o" : File.icon[prefix]
                 });
             }
             this.$element.data("file", this);
@@ -367,7 +348,7 @@
                 if (this.isDirectory) {
                     this.enter();
                 } else {
-                    //todo file ondblclick event
+                    //todo file onDblclick event
                 }
             }, this));
         },
@@ -401,16 +382,19 @@
         onNameFolder: function () {
             var folderName = this.$element.find(".name > input").val();
             var that = this;
-            var dirPath = getSimplePath(this.folder.rootPath + "/" + this.folder.currentPath + "/" + folderName);
+            var dirPath = getSimplePath(this.folder.currentPath + "/" + folderName);
             $.ajax({
                 type: "POST",
                 dataType: "json",
                 url: FileManager.url.createFolder,
+                beforeSend: function (request) {
+                    request.setRequestHeader("X-Auth-Token", App.token);
+                },
                 data: {
                     "dirPath": dirPath
                 },
                 success: function (data) {
-                    if (data.status == 1) {
+                    if (data.code === 200) {
                         that.folder.refresh();
                     }
                 }
@@ -427,18 +411,24 @@
         onRename: function (oldName) {
             var newName = this.$element.find(".name > input").val();
             var that = this;
-            var folderPath = getSimplePath(this.folder.rootPath + "/" + this.folder.currentPath);
+            var folderPath = getSimplePath(this.folder.currentPath);
             $.ajax({
                 type: "POST",
                 dataType: "json",
                 url: FileManager.url.rename,
+                beforeSend: function (request) {
+                    request.setRequestHeader("X-Auth-Token", App.token);
+                },
                 data: {
                     "folderPath": folderPath,
                     "oldName": oldName,
                     "newName": newName
                 },
                 success: function (data) {
-                    if (data.status == 1) {
+                    if (data.code === 200) {
+                        that.folder.refresh();
+                    } else {
+                        alert(data.message);
                         that.folder.refresh();
                     }
                 }
@@ -446,16 +436,19 @@
         },
         deleteFile: function () {
             var that = this;
-            var filePath = getSimplePath(that.folder.rootPath + "/" + that.folder.currentPath + "/" + that.name);
+            var filePath = getSimplePath("/" + that.folder.currentPath + "/" + that.name);
             $.ajax({
                 type: "POST",
                 dataType: "json",
                 url: FileManager.url.deleteFile,
+                beforeSend: function (request) {
+                    request.setRequestHeader("X-Auth-Token", App.token);
+                },
                 data: {
                     "filePath": filePath
                 },
                 success: function (data) {
-                    if (data.status == 1) {
+                    if (data.code === 200) {
                         that.$element.removeData("file");
                         that.$element.remove();
                     }
@@ -464,16 +457,19 @@
         },
         deleteFolder: function () {
             var that = this;
-            var dirPath = getSimplePath(that.folder.rootPath + "/" + that.folder.currentPath + "/" + that.name);
+            var dirPath = getSimplePath("/" + that.folder.currentPath + "/" + that.name);
             $.ajax({
                 type: "POST",
                 dataType: "json",
                 url: FileManager.url.deleteFolder,
+                beforeSend: function (request) {
+                    request.setRequestHeader("X-Auth-Token", App.token);
+                },
                 data: {
                     "dirPath": dirPath
                 },
                 success: function (data) {
-                    if (data.status == 1) {
+                    if (data.code === 200) {
                         that.$element.removeData("file");
                         that.$element.remove();
                     }
@@ -481,38 +477,39 @@
             });
         },
         download: function () {
-            var folderPath = getSimplePath(this.folder.rootPath + "/" + this.folder.currentPath);
+            var folderPath = getSimplePath(this.folder.currentPath);
             var fileName = this.name;
-            window.open(FileManager.url.download + "?folderPath=" + folderPath + "&fileName=" + fileName);
+            window.open(FileManager.url.download + "?orange_token=" + App.token + "&folderPath=" + folderPath + "&fileName=" + fileName);
         },
         unCompress: function () {
             var that = this;
-            var folderPath = getSimplePath(that.folder.rootPath + "/" + that.folder.currentPath);
+            var folderPath = getSimplePath(that.folder.currentPath);
             $.ajax({
                 type: "POST",
                 dataType: "json",
                 url: FileManager.url.unCompress,
+                beforeSend: function (request) {
+                    request.setRequestHeader("X-Auth-Token", App.token);
+                },
                 data: {
                     "folderPath": folderPath,
                     "name": that.name
                 },
                 success: function (data) {
-                    if (data.status == 1) {
+                    if (data.code === 200) {
                         that.folder.refresh();
                     }
                 }
             });
         }
-    }
+    };
 
     var ContextMenu = function (option, manager) {
-        this.$element;
         this.manager = manager;
         this.targetFiles = [];
-        this.targetFiles;
         this.init();
         return this;
-    }
+    };
     ContextMenu.systemOption = {
         items: [
             {
@@ -528,9 +525,7 @@
             }, {
                 text: "解压到当前文件夹",
                 onClick: function (currentFolder, targetFiles, targetFile) {
-                    if (targetFile.isDirectory) {
-                        return;
-                    } else {
+                    if (!targetFile.isDirectory) {
                         targetFile.unCompress();
                     }
                 },
@@ -618,7 +613,7 @@
                 showType: "desk"
             }
         ]
-    }
+    };
 
     ContextMenu.prototype = {
         init: function () {
@@ -642,7 +637,7 @@
                     li.attr("text-handle", true);
                 }
                 if (item.fileType != undefined) {
-                    li.data("file-type", item.fileType)
+                    li.data("file-type", item.fileType);
                     li.attr("file-type", true);
                 }
                 menuUl.append(li);
@@ -658,7 +653,7 @@
                         li.attr("text-handle", true);
                     }
                     if (item.fileType != undefined) {
-                        li.data("file-type", item.fileType)
+                        li.data("file-type", item.fileType);
                         li.attr("file-type", true);
                     }
                     menuUl.append(li);
