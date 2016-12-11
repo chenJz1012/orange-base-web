@@ -157,11 +157,14 @@
             this._columns = options.columns;
             this._pageNum = options.pageNum;
             this._pageSize = options.pageSize;
-            if (options.idFiled != undefined) {
-                this._idField = options.idFiled;
+            if (options.idField != undefined) {
+                this._idField = options.idField;
             } else {
-                console.error("idFiled属性未定义");
+                console.error("idField属性未定义");
                 return;
+            }
+            if (options.headField != undefined) {
+                this._headField = options.headField;
             }
             this._contentType = options.contentType;
             this._showCheck = options.showCheck;
@@ -756,7 +759,7 @@
             var head_array = [];
             var head_index = [];
             var format_array = [];
-            var idFiled = that._idField;
+            var idField = that._idField;
             $.each(that._columns, function (index, column) {
                 head_array.push(column.field);
                 head_index.push(index);
@@ -771,22 +774,24 @@
                     '<div class="thumbnail">' +
                     '<div class="caption">' +
                     '<div class="col-lg-12">' +
-                    '<span class="glyphicon glyphicon-credit-card"></span>' +
-                    '<span class="pull-right" role="checkbox"></span>' +
+                    '<span class="puu-left">' + num + '</span>' +
+                    '<span class="pull-right" role="cb"></span>' +
                     '</div>' +
                     '<div class="col-lg-12 well well-add-card">' +
-                    '<h4></h4>' +
+                    '<h4 role="hd"></h4>' +
                     '</div>' +
-                    '<div role="tr" class="col-lg-12">' +
+                    '<div role="data" class="col-lg-12">' +
                     '</div>' +
                     '<div role="btn-g">' +
                     '</div>' +
                     '</div>' +
                     '</div>' +
                     '</div>');
-                var checkbox = $('<input type="checkbox" class="checkboxes" style="height: 18px;" value="'
-                    + grid[that._idField] + '"/>');
-                ele.find("span[role=checkbox]").append(checkbox);
+                if (that._showCheck) {
+                    var checkbox = $('<input type="checkbox" class="checkboxes" style="height: 18px;" value="'
+                        + grid[that._idField] + '"/>');
+                    ele.find("span[role=cb]").append(checkbox);
+                }
                 $.each(that._columns, function (j, column) {
                     var title = column.title;
                     var field = column.field;
@@ -794,8 +799,11 @@
                     if (column.format != undefined) {
                         html = column.format(num, grid);
                     }
-                    var p = $('<p class="text-muted">' + title + ': ' + html + '</p>');
-                    ele.find("div[role=tr]").append(p);
+                    if (column.field == that._headField) {
+                        ele.find("h4[role=hd]").text(html);
+                    }
+                    var p = $('<div><label>' + title + '</label>  ' + html + '</div>');
+                    ele.find("div[role=data]").append(p);
                 });
                 if (that._actionColumns != undefined) {
                     var _index = i;
@@ -815,7 +823,7 @@
                         if (colum.clsHandle != undefined) {
                             colum.cls = colum.clsHandle(num, current_data);
                         }
-                        var button = $('<button type="button" class="btn btn-xs btn-update btn-add-card ' + colum.cls + '">'+text+'</button>');
+                        var button = $('<button type="button" class="btn btn-xs btn-update btn-add-card ' + colum.cls + '">' + text + '</button>');
                         if (colum.handle != undefined) {
                             button.click(function (e) {
                                 colum.handle(num, current_data);
@@ -836,7 +844,7 @@
             var head_array = [];
             var head_index = [];
             var format_array = [];
-            var idFiled = that._idField;
+            var idField = that._idField;
             $.each(that._columns, function (index, column) {
                 head_array.push(column.field);
                 head_index.push(index);
@@ -891,7 +899,7 @@
                     }
                 }
                 var tr = $.tmpl(trTmpl, {});
-                if (that._showCheck == true) {
+                if (that._showCheck) {
                     var checkboxTh = $.tmpl(thTmpl, {
                         "class_": "table-checkbox",
                         "sorting_": "sorting_disabled"
@@ -901,7 +909,7 @@
                     checkboxTh.append(checkbox);
                     tr.append(checkboxTh);
                 }
-                if (that._showIndexNum == true) {
+                if (that._showIndexNum) {
                     var indexTh = $.tmpl(thTmpl, {
                         "sorting_": "sorting_disabled"
                     });

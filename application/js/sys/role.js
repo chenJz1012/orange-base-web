@@ -29,7 +29,7 @@
             },
             pageNum: 1,//当前页码
             pageSize: 15,//每页显示条数
-            idFiled: "id",//id域指定
+            idField: "id",//id域指定
             showCheckbox: true,//是否显示checkbox
             checkboxWidth: "3%",
             showIndexNum: true,
@@ -39,7 +39,7 @@
                 title: "id",
                 field: "id",
                 sort: true,
-                width: "5%",
+                width: "5%"
             }, {
                 title: "角色名称",
                 field: "roleName",
@@ -138,7 +138,7 @@
                         },
                         pageNum: 1,//当前页码
                         pageSize: 15,//每页显示条数
-                        idFiled: "userId",//id域指定
+                        idField: "userId",//id域指定
                         showCheckbox: true,//是否显示checkbox
                         checkboxWidth: "3%",
                         showIndexNum: false,
@@ -148,7 +148,7 @@
                             title: "用户id",
                             field: "userId",
                             sort: true,
-                            width: "5%",
+                            width: "5%"
                         }, {
                             title: "登录名",
                             field: "loginName",
@@ -226,26 +226,30 @@
                 text: "删除",
                 cls: "btn-danger btn-sm",
                 handle: function (index, data) {
-                    var requestUrl = App.href + "/api/sys/role/delete";
-                    $.ajax({
-                        type: "POST",
-                        beforeSend: function (request) {
-                            request.setRequestHeader("X-Auth-Token", App.token);
-                        },
-                        dataType: "json",
-                        data: {
-                            roleId: data.id
-                        },
-                        url: requestUrl,
-                        success: function (data) {
-                            if (data.code === 200) {
-                                grid.reload();
-                            } else {
-                                alert(data.message);
-                            }
-                        },
-                        error: function (e) {
-                            alert("请求异常。");
+                    bootbox.confirm("确定该操作?", function (result) {
+                        if (result) {
+                            var requestUrl = App.href + "/api/sys/role/delete";
+                            $.ajax({
+                                type: "POST",
+                                beforeSend: function (request) {
+                                    request.setRequestHeader("X-Auth-Token", App.token);
+                                },
+                                dataType: "json",
+                                data: {
+                                    roleId: data.id
+                                },
+                                url: requestUrl,
+                                success: function (data) {
+                                    if (data.code === 200) {
+                                        grid.reload();
+                                    } else {
+                                        alert(data.message);
+                                    }
+                                },
+                                error: function (e) {
+                                    alert("请求异常。");
+                                }
+                            });
                         }
                     });
                 }

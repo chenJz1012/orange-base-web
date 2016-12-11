@@ -30,7 +30,8 @@
             contentType: "card",
             pageNum: 1,//当前页码
             pageSize: 15,//每页显示条数
-            idFiled: "id",//id域指定
+            idField: "id",//id域指定
+            headField: "functionName",
             showCheckbox: true,//是否显示checkbox
             checkboxWidth: "3%",
             showIndexNum: false,
@@ -40,12 +41,12 @@
                 title: "id",
                 field: "id",
                 sort: true,
-                width: "5%",
+                width: "5%"
             }, {
                 title: "父id",
                 field: "parentId",
                 sort: true,
-                width: "5%",
+                width: "5%"
             }, {
                 title: "菜单名称",
                 field: "functionName",
@@ -159,35 +160,56 @@
                 text: "删除",
                 cls: "btn-danger btn-sm",
                 handle: function (index, data) {
-                    var requestUrl = App.href + "/api/sys/function/delete";
-                    $.ajax({
-                        type: "POST",
-                        beforeSend: function (request) {
-                            request.setRequestHeader("X-Auth-Token", App.token);
-                        },
-                        dataType: "json",
-                        data: {
-                            functionId: data.id
-                        },
-                        url: requestUrl,
-                        success: function (data) {
-                            if (data.code === 200) {
-                                grid.reload();
-                            } else {
-                                alert(data.message);
-                            }
-                        },
-                        error: function (e) {
-                            alert("请求异常。");
+                    bootbox.confirm("确定该操作?", function(result) {
+                        if (result) {
+                            var requestUrl = App.href + "/api/sys/function/delete";
+                            $.ajax({
+                                type: "POST",
+                                beforeSend: function (request) {
+                                    request.setRequestHeader("X-Auth-Token", App.token);
+                                },
+                                dataType: "json",
+                                data: {
+                                    functionId: data.id
+                                },
+                                url: requestUrl,
+                                success: function (data) {
+                                    if (data.code === 200) {
+                                        grid.reload();
+                                    } else {
+                                        alert(data.message);
+                                    }
+                                },
+                                error: function (e) {
+                                    alert("请求异常。");
+                                }
+                            });
                         }
                     });
                 }
             }],
             tools: [
                 {
-                    text: " 添 加",//按钮文本
+                    text: "",//按钮文本
                     cls: "btn btn-primary",//按钮样式
                     icon: "fa fa-cubes",
+                    handle: function (grid) {
+                        if (grid._contentType == "card") {
+                            grid.reload({
+                                contentType: "table"
+                            });
+                        } else {
+                            grid.reload({
+                                contentType: "card"
+                            });
+                        }
+
+                    }
+                },
+                {
+                    text: " 添 加",//按钮文本
+                    cls: "btn btn-primary",//按钮样式
+                    icon: "fa fa-plus",
                     handle: function (grid) {
                         var modal = $.orangeModal({
                             id: "functionForm",
