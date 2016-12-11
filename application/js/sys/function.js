@@ -27,6 +27,7 @@
             beforeSend: function (request) {
                 request.setRequestHeader("X-Auth-Token", App.token);
             },
+            contentType: "card",
             pageNum: 1,//当前页码
             pageSize: 15,//每页显示条数
             idFiled: "id",//id域指定

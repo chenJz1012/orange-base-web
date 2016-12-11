@@ -373,3 +373,20 @@ ul.nav.navbar-nav.navbar-right:last-child {
 .side-page{
     margin-left: 0;
 }
+
+footer {
+    background-color: #d9edf7;
+    box-shadow: inset 0px 0px 3px #bce8f1;
+    color: #6887c4;
+    font-size: 14px;
+    line-height: 25px;
+    padding: 10px 0px 10px 0px;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+
+footer .copy {
+    font-size: 13px;
+    margin: 15px 0px;
+}

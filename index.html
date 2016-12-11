@@ -75,7 +75,7 @@
                         <ul class="dropdown-menu animated flipInX" role="menu">
                             <li><a id="side-vertical" href="javascript:void(0);"><i class="fa fa-gear"></i> 切换横竖屏</a>
                             </li>
-                            <li><a href="./login.html">退出登录</a></li>
+                            <li><a id="logout" href="javascript:void(0);">退出登录</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -118,6 +118,13 @@
     </div>
     <!-- /#page-wrapper -->
 </div>
+<footer>
+    <div class="container">
+        <div class="copy text-center">
+            版权所有 <a href='#'>orange.cn</a>
+        </div>
+    </div>
+</footer>
 <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
 <script src="vendors/jquery/dist/jquery.js"></script>
 <script src="vendors/bootstrap/js/bootstrap.min.js"></script>
@@ -130,6 +137,7 @@
 <script src="vendors/moment.js"></script>
 <script src="vendors/ajaxfileupload.js"></script>
 <script src="vendors/jquery.cookie/jquery.cookie.js"></script>
+<script src="vendors/bootbox.js"></script>
 <script src="vendors/jquery.validate.min.js"></script>
 <script src="vendors/additional-methods.min.js"></script>
 <!-- Include all compiled plugins (below), or include individual files as needed -->
@@ -155,5 +163,29 @@
 <script src="application/js/sys/user.js"></script>
 <script src="application/js/sys/role.js"></script>
 <script src="application/js/sys/function.js"></script>
+<script type="text/javascript">
+    bootbox.setLocale("zh_CN");
+    $("#logout").on("click", function () {
+        $.ajax(
+            {
+                type: 'GET',
+                url: App.href + "/api/logout",
+                contentType: "application/json",
+                beforeSend: function (request) {
+                    request.setRequestHeader("X-Auth-Token", App.token);
+                },
+                dataType: "json",
+                success: function (result) {
+                    if (result.code == 200) {
+                        $.cookie('tc_t', null);
+                        window.location.href = App.href + "/login.html";
+                    } else {
+                        alert(result.message);
+                    }
+                }
+            }
+        );
+    });
+</script>
 </body>
 </html>

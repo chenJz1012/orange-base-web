@@ -15,57 +15,58 @@
         var postfix = string.substring(string.lastIndexOf("."), string.length);
         return postfix.toLowerCase();
     };
-
-    var dataDefaults = {
-        showDropdowns: true,
-        linkedCalendars: false,
-        autoApply: false,
-        ranges: {
-            '今天': [moment().startOf('day'), moment()],
-            '昨天': [moment().subtract(1, 'days').startOf('day'), moment().subtract(1, 'days').endOf('day')],
-            '最近七天': [moment().subtract(6, 'days'), moment()],
-            '最近三十天': [moment().subtract(29, 'days'), moment()],
-            '本月': [moment().startOf('month'), moment().endOf('month')],
-            '上月': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
-        },
-        locale: {
-            "format": 'YYYY-MM-DD HH:mm:ss',
-            "separator": " 到 ",
-            "applyLabel": "确定",
-            "cancelLabel": "取消",
-            "fromLabel": "从",
-            "toLabel": "到",
-            "customRangeLabel": "自定义",
-            "daysOfWeek": [
-                "周日",
-                "周一",
-                "周二",
-                "周三",
-                "周四",
-                "周五",
-                "周六"
-            ],
-            "monthNames": [
-                "一月",
-                "二月",
-                "三月",
-                "四月",
-                "五月",
-                "六月",
-                "七月",
-                "八月",
-                "九月",
-                "十月",
-                "十一月",
-                "十二月"
-            ],
-            "firstDay": 1
-        },
-        timePicker: true,
-        timePicker24Hour: true,
-        timePickerSeconds: true
-    };
-
+    var dataDefaults = {};
+    if (typeof(moment) != "undefined") {
+        dataDefaults = {
+            showDropdowns: true,
+            linkedCalendars: false,
+            autoApply: false,
+            ranges: {
+                '今天': [moment().startOf('day'), moment()],
+                '昨天': [moment().subtract(1, 'days').startOf('day'), moment().subtract(1, 'days').endOf('day')],
+                '最近七天': [moment().subtract(6, 'days'), moment()],
+                '最近三十天': [moment().subtract(29, 'days'), moment()],
+                '本月': [moment().startOf('month'), moment().endOf('month')],
+                '上月': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+            },
+            locale: {
+                "format": 'YYYY-MM-DD HH:mm:ss',
+                "separator": " 到 ",
+                "applyLabel": "确定",
+                "cancelLabel": "取消",
+                "fromLabel": "从",
+                "toLabel": "到",
+                "customRangeLabel": "自定义",
+                "daysOfWeek": [
+                    "周日",
+                    "周一",
+                    "周二",
+                    "周三",
+                    "周四",
+                    "周五",
+                    "周六"
+                ],
+                "monthNames": [
+                    "一月",
+                    "二月",
+                    "三月",
+                    "四月",
+                    "五月",
+                    "六月",
+                    "七月",
+                    "八月",
+                    "九月",
+                    "十月",
+                    "十一月",
+                    "十二月"
+                ],
+                "firstDay": 1
+            },
+            timePicker: true,
+            timePicker24Hour: true,
+            timePickerSeconds: true
+        };
+    }
     var Form = function (element, options, callback) {
         this._setVariable(element, options);
         this._setOptions(this._options);
@@ -274,6 +275,11 @@
                                 formBody.append(ele);
                                 return;
                             }
+                            var itemSpan = item.span > 1 ? item.span : 1;
+                            itemSpan = itemSpan > rowEleNum ? rowEleNum : itemSpan;
+                            if (itemSpan > 1) {
+                                that._labelInline = false;
+                            }
                             // 计算分布
                             if (count % rowEleNum == 0) {
                                 row = $.tmpl(Form.statics.rowTmpl, {
@@ -281,11 +287,12 @@
                                 });
                                 formBody.append(row);
                             }
-                            count++;
+                            count += itemSpan;
                             var wrapper = $.tmpl(Form.statics.eleTmpl,
                                 {
-                                    "span_": rowEleSpan
-                                });
+                                    "span_": rowEleSpan * itemSpan
+                                }
+                            );
 
                             // 构建元素
                             that._buildModuleWrapper(wrapper, item);
@@ -525,14 +532,16 @@
                     "attribute_": (data.attribute == undefined ? ""
                         : data.attribute)
                 });
-                $.each(data.items, function (i, option) {
-                    var opt = $.tmpl(optionTmpl, {
-                        "value_": option.value,
-                        "text_": option.text,
-                        "selected": (option.selected ? "selected" : "")
+                if (data.items != undefined && data.items.length > 0) {
+                    $.each(data.items, function (i, option) {
+                        var opt = $.tmpl(optionTmpl, {
+                            "value_": option.value,
+                            "text_": option.text,
+                            "selected": (option.selected ? "selected" : "")
+                        });
+                        ele.append(opt);
                     });
-                    ele.append(opt);
-                });
+                }
                 if (data.itemsUrl != undefined) {
                     $.ajax({
                         type: "POST",
@@ -564,9 +573,8 @@
                     "attribute_": (data.attribute == undefined ? ""
                         : data.attribute)
                 });
-
-                $
-                    .each(
+                if (data.items != undefined && data.items.length > 0) {
+                    $.each(
                         data.items,
                         function (i, checkbox) {
                             var cb = $
@@ -586,7 +594,9 @@
                                             : checkbox.attribute)
                                     });
                             ele.append(cb);
-                        });
+                        }
+                    );
+                }
                 if (data.itemsUrl != undefined) {
                     $
                         .ajax({
@@ -595,30 +605,30 @@
                             async: data.async ? true : false,
                             url: data.itemsUrl,
                             success: function (cbs) {
-                                $
-                                    .each(
-                                        cbs,
-                                        function (i, checkbox) {
-                                            var cb = $
-                                                .tmpl(
-                                                    checkboxTmpl,
-                                                    {
-                                                        "inline_": data.inline ? inlineCls
-                                                            : "",
-                                                        "name_": data.name,
-                                                        "value_": checkbox.value,
-                                                        "text_": checkbox.text,
-                                                        "checked": (checkbox.checked ? "checked=checked"
-                                                            : ""),
-                                                        "disabled_": (checkbox.disabled ? "disabled"
-                                                            : ""),
-                                                        "attribute_": (checkbox.attribute == undefined ? ""
-                                                            : checkbox.attribute)
-                                                    });
-                                            ele.append(cb);
-                                            Form.prototype
-                                                ._uniform();
-                                        });
+                                $.each(
+                                    cbs,
+                                    function (i, checkbox) {
+                                        var cb = $
+                                            .tmpl(
+                                                checkboxTmpl,
+                                                {
+                                                    "inline_": data.inline ? inlineCls
+                                                        : "",
+                                                    "name_": data.name,
+                                                    "value_": checkbox.value,
+                                                    "text_": checkbox.text,
+                                                    "checked": (checkbox.checked ? "checked=checked"
+                                                        : ""),
+                                                    "disabled_": (checkbox.disabled ? "disabled"
+                                                        : ""),
+                                                    "attribute_": (checkbox.attribute == undefined ? ""
+                                                        : checkbox.attribute)
+                                                });
+                                        ele.append(cb);
+                                        Form.prototype
+                                            ._uniform();
+                                    }
+                                );
                             }
                         });
                 }
@@ -635,18 +645,20 @@
                     "attribute_": (data.attribute == undefined ? ""
                         : data.attribute)
                 });
-                $.each(data.items, function (i, radio) {
-                    var rd = $.tmpl(radioTmpl, {
-                        "inline_": data.inline ? inlineCls : "",
-                        "name_": data.name,
-                        "value_": radio.value,
-                        "text_": radio.text,
-                        "checked_": (radio.checked ? "checked=checked" : ""),
-                        "attribute_": (radio.attribute == undefined ? ""
-                            : radio.attribute)
+                if (data.items != undefined && data.items.length > 0) {
+                    $.each(data.items, function (i, radio) {
+                        var rd = $.tmpl(radioTmpl, {
+                            "inline_": data.inline ? inlineCls : "",
+                            "name_": data.name,
+                            "value_": radio.value,
+                            "text_": radio.text,
+                            "checked_": (radio.checked ? "checked=checked" : ""),
+                            "attribute_": (radio.attribute == undefined ? ""
+                                : radio.attribute)
+                        });
+                        ele.append(rd);
                     });
-                    ele.append(rd);
-                });
+                }
                 if (data.itemsUrl != undefined) {
                     $
                         .ajax({
@@ -684,13 +696,22 @@
             },
             'datepicker': function (data, form) {
                 var dateTmpl = '<div class="input-group input-medium">'
-                    + '<input type="text" role="date-input" id="${id_}" name=${name_} class="form-control">'
+                    + '<input type="text" role="date-input" id="${id_}" name=${name_} value="${value_}" class="form-control">'
                     + '<span role="icon" class="input-group-addon">'
                     + '<i class="glyphicon glyphicon-calendar fa fa-calendar"></i>' + '</span></div>';
+                if (typeof(moment) == "undefined") {
+                    return $.tmpl(dateTmpl, {
+                        "id_": (data.id == undefined ? data.name : data.id),
+                        "name_": data.name,
+                        "cls_": data.cls == undefined ? "" : data.cls,
+                        "value_": ""
+                    });
+                }
                 var ele = $.tmpl(dateTmpl, {
                     "id_": (data.id == undefined ? data.name : data.id),
                     "name_": data.name,
-                    "cls_": data.cls == undefined ? "" : data.cls
+                    "cls_": data.cls == undefined ? "" : data.cls,
+                    "value_": (data.value == undefined ? moment().format('YYYY-MM-DD HH:mm:ss') : data.value)
                 });
                 config = (data.config == undefined ? {} : data.config);
                 var option = $.extend(true, dataDefaults, config);
@@ -792,7 +813,9 @@
                     });
                 }
                 return ele;
-            },
+            }
+
+            ,
             'files': function (data, form) {
                 var filesTmpl = '<span class="btn btn-success fileinput-button">'
                     + '<span class="glyphicon glyphicon-plus"></span>'
@@ -817,7 +840,9 @@
                 ele.append(btn);
                 ele.append(table);
                 return ele;
-            },
+            }
+
+            ,
             'image': function (data, form) {
                 var imageTmpl = '<div><div class="fileinput fileinput-new" data-provides="fileinput">'
                     + '<div class="fileinput-preview thumbnail" role="preview" data-trigger="fileinput" style="width: 200px; height: 150px; line-height: 150px;"></div>'
@@ -960,7 +985,7 @@
                 } : data.beforeCheck;
                 var setting = {
                     check: {
-                        enable: true,
+                        enable: (data.checkable == undefined ? true : data.checkable),
                         chkStyle: data.chkStyle,
                         radioType: "all",
                         chkboxType: chkboxType
@@ -1072,8 +1097,7 @@
                             var edWith = ele
                                 .data("width") == undefined ? "100%" : ele.data("width");
                             var editor = KE
-                                .create(
-                                    '#' + ele.attr("id"),
+                                .create('#' + ele.attr("id"),
                                     {
                                         uploadJson: App.href
                                         + '/api/KE/fileUpload?orange_token=' + App.token,
@@ -1081,10 +1105,8 @@
                                         + '/api/KE/fileManager?orange_token=' + App.token,
                                         minWidth: 0,
                                         width: edWith,
-                                        height: ele
-                                            .data("height") == undefined ? '400px'
-                                            : ele
-                                            .data("height"),
+                                        height: (ele
+                                            .data("height") == undefined ? '400px' : ele.data("height")),
                                         allowFileManager: true,
                                         afterBlur: function () {
                                             this.sync();
@@ -1224,7 +1246,7 @@
                 + '</td>'
                 + '<td style="width: 50%;vertical-align: middle;border-bottom: 1px solid #ddd;">'
                 + '<p class="name">${fileName_}</p>'
-                + '<p class="size">${fileSize_} KB <span class="progress">0%</span></p>'
+                + '<p class="size">${fileSize_} KB</p>'
                 + '</td>'
                 + '<td style="width: 30%;vertical-align: middle;">'
                 + '    <button type="button" class="btn btn-warning btn-sm cancel">删除</button>        '
@@ -1254,6 +1276,7 @@
                     success: function (data) {
                         if (data.code == 200) {
                             var file = $.tmpl(template, {
+                                "alt_": data.data.attachmentSuffix,
                                 "fileName_": data.data.attachmentName,
                                 "fileSize_": (data.data.attachmentSize / 1000)
                                     .toFixed(2),

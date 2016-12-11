@@ -4,7 +4,7 @@
 ;
 (function ($, window, document, undefined) {
     window.App = {
-        href: "http://orange.com",
+        href: "http://127.0.0.1",
         requestMapping: {}
     };
 

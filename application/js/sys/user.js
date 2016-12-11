@@ -49,7 +49,7 @@
                 title: "id",
                 field: "id",
                 sort: true,
-                width: "5%",
+                width: "5%"
             }, {
                 title: "登录名",
                 field: "loginName",
