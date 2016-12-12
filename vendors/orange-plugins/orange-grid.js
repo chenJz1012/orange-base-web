@@ -8,17 +8,16 @@
         this._setOptions(this._options);
         this._initEmpty();
         if (!this._autoLoad)
-            return;
+            return
         if (this._url != undefined) {
             this._load();
-            return;
+            return
         }
         if (this._data != undefined) {
             this._init();
-            return;
+            return
         }
         console.error("data或url未定义");
-        return;
     };
     Grid.defaults = {
         autoLoad: true,
@@ -53,8 +52,8 @@
         searchElementTmpl: '<div class="col-md-${span_}"><div class="form-group">'
         + '</div></div>',
         gridWrapperTmpl: '<div id="${id_}_wrapper" class="dataTables_wrapper no-footer"></div>',
-        tableRowTmpl: '<div class="table-scrollable"></div>',
-        cardRowTmpl: '<div class="table-scrollable" style="margin-top: 10px;margin-bottom: 0px;"></div>',
+        tableRowTmpl: '<div role="content" class="table-scrollable"></div>',
+        cardRowTmpl: '<div role="content" class="table-scrollable" style="margin-top: 10px;margin-bottom: 0px;"></div>',
         pagingRowTmpl: '<div class="row"><div role="select" class="col-md-2 col-sm-6"></div><div role="info" class="col-md-3 col-sm-6"></div><div role="goPage" class="col-md-2 col-sm-6" style="text-align: right;"></div><div role="page" class="col-md-5 col-sm-6"></div></div>',
         labelTmpl: '<label>${label_}</label>',
         textTmpl: '<input type="text" name="${name_}" id="${id_}" class="form-control ${span_}" placeholder="${placeholder_}" value="${value_}">',
@@ -745,14 +744,33 @@
             });
             this.$element.append(gridWrapper);
             this.$gridWrapper = gridWrapper;
+            var contentTypeBtn = $('<div class="row"><div class="col-lg-12">' +
+                '<div id="tab" class="btn-group pull-right">' +
+                '<a role="table" class="btn btn-large btn-info" title="列表" ><i class="fa fa-list"></i></a>' +
+                '<a role="card" class="btn btn-large btn-info" title="卡片"><i class="fa fa-th"></i></a>' +
+                '</div>' +
+                '</div></div>');
+            gridWrapper.append(contentTypeBtn);
+            this.$contentTypeBtn = contentTypeBtn;
             if (this._contentType === "table") {
+                this.$contentTypeBtn.find("a[role=table]").addClass("active");
+                this.$contentTypeBtn.find("a[role=card]").removeClass("active");
                 this._renderTable();
             } else {
+                this.$contentTypeBtn.find("a[role=table]").removeClass("active");
+                this.$contentTypeBtn.find("a[role=card]").addClass("active");
                 this._renderCard();
             }
             if (this._showPaging) {
                 this._renderPaging();
             }
+            this.$contentTypeBtn.find("a").off("click");
+            this.$contentTypeBtn.find("a").on("click", function () {
+                var role = $(this).attr("role");
+                that._reload({
+                    contentType: role
+                });
+            });
         },
         _renderCard: function () {
             var that = this;
@@ -766,7 +784,6 @@
                 format_array.push(column.format);
             });
             var cardRow = $.tmpl(Grid.statics.cardRowTmpl, {});
-
             var row = $('<div class="row"></div>');
             $.each(that._grids, function (i, grid) {
                 var num = (that._pageNum - 1) * that._pageSize + i + 1;
@@ -823,7 +840,7 @@
                         if (colum.clsHandle != undefined) {
                             colum.cls = colum.clsHandle(num, current_data);
                         }
-                        var button = $('<button type="button" class="btn btn-xs btn-update btn-add-card ' + colum.cls + '">' + text + '</button>');
+                        var button = $('<button type="button" class="btn btn-update btn-add-card ' + colum.cls + '">' + text + '</button>');
                         if (colum.handle != undefined) {
                             button.click(function (e) {
                                 colum.handle(num, current_data);

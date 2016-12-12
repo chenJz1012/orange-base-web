@@ -208,7 +208,7 @@
                 text: "删除",
                 cls: "btn-danger btn-sm",
                 handle: function (index, data) {
-                    bootbox.confirm("确定该操作?", function(result) {
+                    bootbox.confirm("确定该操作?", function (result) {
                         if (result) {
                             var requestUrl = App.href + "/api/sys/user/delete";
                             $.ajax({
@@ -386,13 +386,15 @@
                                 name: 'accountNonLocked',
                                 id: 'accountNonLocked',
                                 label: '账号锁定状态',
-                                items: [{
-                                    value: true,
-                                    text: '开启'
-                                }, {
-                                    value: false,
-                                    text: '锁定'
-                                }],
+                                items: [
+                                    {
+                                        value: true,
+                                        text: '开启'
+                                    }, {
+                                        value: false,
+                                        text: '锁定'
+                                    }
+                                ],
                                 rule: {
                                     required: true
                                 },

@@ -190,23 +190,6 @@
             }],
             tools: [
                 {
-                    text: "",//按钮文本
-                    cls: "btn btn-primary",//按钮样式
-                    icon: "fa fa-cubes",
-                    handle: function (grid) {
-                        if (grid._contentType == "card") {
-                            grid.reload({
-                                contentType: "table"
-                            });
-                        } else {
-                            grid.reload({
-                                contentType: "card"
-                            });
-                        }
-
-                    }
-                },
-                {
                     text: " 添 加",//按钮文本
                     cls: "btn btn-primary",//按钮样式
                     icon: "fa fa-plus",
