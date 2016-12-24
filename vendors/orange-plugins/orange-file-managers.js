@@ -642,7 +642,7 @@
                 }
                 menuUl.append(li);
             });
-            if (option.items.length > 0) {
+            if (option.items!=undefined&&option.items.length > 0) {
                 $.each(option.items, function (i, item) {
                     var li = $.tmpl(FileManager.tpl.ContextMenu[item.showType], {
                         "text_": item.text

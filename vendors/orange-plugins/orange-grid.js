@@ -54,6 +54,7 @@
         gridWrapperTmpl: '<div id="${id_}_wrapper" class="dataTables_wrapper no-footer"></div>',
         tableRowTmpl: '<div role="content" class="table-scrollable"></div>',
         cardRowTmpl: '<div role="content" class="table-scrollable" style="margin-top: 10px;margin-bottom: 0px;"></div>',
+        listRowTmpl: '<div role="content" class="table-scrollable" style="margin-top: 10px;margin-bottom: 0px;"></div>',
         pagingRowTmpl: '<div class="row"><div role="select" class="col-md-2 col-sm-6"></div><div role="info" class="col-md-3 col-sm-6"></div><div role="goPage" class="col-md-2 col-sm-6" style="text-align: right;"></div><div role="page" class="col-md-5 col-sm-6"></div></div>',
         labelTmpl: '<label>${label_}</label>',
         textTmpl: '<input type="text" name="${name_}" id="${id_}" class="form-control ${span_}" placeholder="${placeholder_}" value="${value_}">',
@@ -227,7 +228,7 @@
                 type: that._type,
                 dataType: "json",
                 data: that.$searchForm == undefined ? {} : that.$searchForm
-                    .serialize(),
+                        .serialize(),
                 beforeSend: function (request) {
                     if (that._beforeSend != undefined) {
                         that._beforeSend(request);
@@ -746,8 +747,9 @@
             this.$gridWrapper = gridWrapper;
             var contentTypeBtn = $('<div class="row"><div class="col-lg-12">' +
                 '<div id="tab" class="btn-group pull-right">' +
-                '<a role="table" class="btn btn-large btn-info" title="列表" ><i class="fa fa-list"></i></a>' +
+                '<a role="table" class="btn btn-large btn-info" title="表格" ><i class="fa fa-table"></i></a>' +
                 '<a role="card" class="btn btn-large btn-info" title="卡片"><i class="fa fa-th"></i></a>' +
+                '<a role="list" class="btn btn-large btn-info" title="列表"><i class="fa fa-list"></i></a>' +
                 '</div>' +
                 '</div></div>');
             gridWrapper.append(contentTypeBtn);
@@ -755,11 +757,18 @@
             if (this._contentType === "table") {
                 this.$contentTypeBtn.find("a[role=table]").addClass("active");
                 this.$contentTypeBtn.find("a[role=card]").removeClass("active");
+                this.$contentTypeBtn.find("a[role=list]").removeClass("active");
                 this._renderTable();
-            } else {
+            } else if (this._contentType === "card") {
                 this.$contentTypeBtn.find("a[role=table]").removeClass("active");
                 this.$contentTypeBtn.find("a[role=card]").addClass("active");
+                this.$contentTypeBtn.find("a[role=list]").removeClass("active");
                 this._renderCard();
+            } else if (this._contentType === "list") {
+                this.$contentTypeBtn.find("a[role=table]").removeClass("active");
+                this.$contentTypeBtn.find("a[role=card]").removeClass("active");
+                this.$contentTypeBtn.find("a[role=list]").addClass("active");
+                this._renderList();
             }
             if (this._showPaging) {
                 this._renderPaging();
@@ -772,12 +781,91 @@
                 });
             });
         },
+        _renderList: function () {
+            var that = this;
+            var head_array = [];
+            var head_index = [];
+            var format_array = [];
+            $.each(that._columns, function (index, column) {
+                head_array.push(column.field);
+                head_index.push(index);
+                format_array.push(column.format);
+            });
+            var listRow = $.tmpl(Grid.statics.listRowTmpl, {});
+            var ul = $('<ul class="event-list"></ul>');
+            $.each(that._grids, function (i, grid) {
+                var num = (that._pageNum - 1) * that._pageSize + i + 1;
+                var ele = $('<li>' +
+                    '<time>' +
+                    '<span class="day">' + num + '</span>' +
+                    '</time>' +
+                    '<div class="info">' +
+                    '<h2 class="title" role="hd"></h2>' +
+                    '<div style="padding-left: 10px;" role="data">' +
+                    '</div>' +
+                    '<ul role="btn-g">' +
+                    '</ul>' +
+                    '</div>' +
+                    '</li>');
+
+                $.each(that._columns, function (j, column) {
+                    var title = column.title;
+                    var field = column.field;
+                    var html = grid[field];
+                    if (column.format != undefined) {
+                        html = column.format(num, grid);
+                    }
+                    if (that._headField == undefined) {
+                        ele.find("h2[role=hd]").text(grid[that._idField]);
+                    }
+                    if (column.field == that._headField) {
+                        ele.find("h2[role=hd]").text(html);
+                    }
+                    var span = $('<span class="desc"><label>' + title + '</label>  ' + html + '</span>   ');
+                    ele.find("div[role=data]").append(span);
+                });
+                if (that._actionColumns != undefined) {
+                    var _index = i;
+                    var current_data = grid;
+                    var percent = 0;
+                    if (that._actionColumns.length > 0) {
+                        percent = parseFloat(1 / that._actionColumns.length) * 100;
+                    }
+                    $.each(that._actionColumns, function (k, colum) {
+                        var visible = true;
+                        if (colum.visible != undefined) {
+                            visible = colum.visible(_index, current_data);
+                        }
+                        if (visible == false) {
+                            return;
+                        }
+                        var text = colum.text;
+                        if (colum.textHandle != undefined) {
+                            text = colum.textHandle(num, current_data);
+                        }
+                        if (colum.clsHandle != undefined) {
+                            colum.cls = colum.clsHandle(num, current_data);
+                        }
+                        var li = $('<li style="width:' + percent + '%;">' + text + '</li>');
+                        if (colum.handle != undefined) {
+                            li.click(function (e) {
+                                colum.handle(num, current_data);
+                                e.stopPropagation();
+                            });
+                        }
+                        ele.find("ul[role=btn-g]").append(li);
+                    });
+                }
+                ul.append(ele);
+            });
+            listRow.append(ul);
+            this.$gridWrapper.append(listRow);
+        },
         _renderCard: function () {
             var that = this;
             var head_array = [];
             var head_index = [];
             var format_array = [];
-            var idField = that._idField;
             $.each(that._columns, function (index, column) {
                 head_array.push(column.field);
                 head_index.push(index);
@@ -815,6 +903,9 @@
                     var html = grid[field];
                     if (column.format != undefined) {
                         html = column.format(num, grid);
+                    }
+                    if (that._headField == undefined) {
+                        ele.find("h4[role=hd]").text(grid[that._idField]);
                     }
                     if (column.field == that._headField) {
                         ele.find("h4[role=hd]").text(html);
@@ -861,7 +952,6 @@
             var head_array = [];
             var head_index = [];
             var format_array = [];
-            var idField = that._idField;
             $.each(that._columns, function (index, column) {
                 head_array.push(column.field);
                 head_index.push(index);
@@ -1108,7 +1198,7 @@
                 + '_info" role="status" aria-live="polite"></div>');
             var text = "<label style='font-size: initial;'>当前 "
                 + (this._total == 0 ? "0" : ((this._pageNum - 1)
-                * this._pageSize + 1))
+                    * this._pageSize + 1))
                 + " 到 "
                 + ((this._pageNum * this._pageSize) > this._total ? this._total
                     : (this._pageNum * this._pageSize)) + " 共 "

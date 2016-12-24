@@ -18,7 +18,12 @@
         page: function (title) {
             App.content.empty();
             App.title(title);
-            var content = $('<div class="panel-body" id="index_grid"></div>');
+            var content = $('<div class="panel-body" >' +
+                '<div class="row">' +
+                '<div class="col-md-6" id="index_grid"></div> ' +
+                '<div class="col-md-6" id="index_manager"></div> ' +
+                '</div>' +
+                '</div>');
             App.content.append(content);
             App.index.initEvents();
         }
@@ -186,6 +191,7 @@
             }]
         };
         var form = App.content.find("#index_grid").orangeForm(formOpts);
+        var manager = App.content.find("#index_manager").fileManager();
     };
 
 })(jQuery, window, document);

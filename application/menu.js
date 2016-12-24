@@ -251,7 +251,7 @@
             if (f != undefined) {
                 App[f].page(title);
                 var a;
-                if (App.toggle == "v") {
+                if (App.toggle ==undefined || App.toggle == "v") {
                     a = $(ul).find("li[class!=dropdown] > a[data-url='" + url + "']");
                     a.parent().siblings("li").removeClass("active");
                     a.parent().parent().parent().siblings("li").removeClass("active");

@@ -30,6 +30,7 @@
             pageNum: 1,//当前页码
             pageSize: 15,//每页显示条数
             idField: "id",//id域指定
+            headField: "roleName",
             showCheckbox: true,//是否显示checkbox
             checkboxWidth: "3%",
             showIndexNum: true,
