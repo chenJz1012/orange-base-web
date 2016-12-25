@@ -32,7 +32,7 @@
             pageSize: 15,//每页显示条数
             idField: "id",//id域指定
             headField: "functionName",
-            showCheckbox: true,//是否显示checkbox
+            showCheck: true,//是否显示checkbox
             checkboxWidth: "3%",
             showIndexNum: false,
             indexNumWidth: "5%",

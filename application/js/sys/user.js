@@ -42,7 +42,7 @@
             idField: "id",//id域指定
             contentType: "list",
             headField: "loginName",
-            showCheckbox: true,//是否显示checkbox
+            showCheck: true,//是否显示checkbox
             checkboxWidth: "3%",
             showIndexNum: true,
             indexNumWidth: "5%",
