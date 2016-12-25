@@ -15,9 +15,9 @@
         var postfix = string.substring(string.lastIndexOf("."), string.length);
         return postfix.toLowerCase();
     };
-    var dataDefaults = {};
+    var dateDefaults = {};
     if (typeof(moment) != "undefined") {
-        dataDefaults = {
+        dateDefaults = {
             showDropdowns: true,
             linkedCalendars: false,
             autoApply: false,
@@ -714,7 +714,7 @@
                     "value_": (data.value == undefined ? moment().format('YYYY-MM-DD HH:mm:ss') : data.value)
                 });
                 config = (data.config == undefined ? {} : data.config);
-                var option = $.extend(true, dataDefaults, config);
+                var option = $.extend(true, dateDefaults, config);
                 if (data.callback != undefined) {
                     ele.find('[role="date-input"]').daterangepicker(option, data.callback);
                 } else {

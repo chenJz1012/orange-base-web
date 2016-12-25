@@ -19,6 +19,58 @@
         }
         console.error("data或url未定义");
     };
+    var dateDefaults = {};
+    if (typeof(moment) != "undefined") {
+        dateDefaults = {
+            showDropdowns: true,
+            linkedCalendars: false,
+            autoApply: false,
+            ranges: {
+                '今天': [moment().startOf('day'), moment().startOf('day')],
+                '昨天': [moment().subtract(1, 'days').startOf('day'), moment().subtract(1, 'days').endOf('day')],
+                '最近七天': [moment().subtract(6, 'days'), moment()],
+                '最近三十天': [moment().subtract(29, 'days'), moment()],
+                '本月': [moment().startOf('month'), moment().endOf('month')],
+                '上月': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+            },
+            locale: {
+                "format": 'YYYY-MM-DD HH:mm:ss',
+                "separator": " 到 ",
+                "applyLabel": "确定",
+                "cancelLabel": "取消",
+                "fromLabel": "从",
+                "toLabel": "到",
+                "customRangeLabel": "自定义",
+                "daysOfWeek": [
+                    "周日",
+                    "周一",
+                    "周二",
+                    "周三",
+                    "周四",
+                    "周五",
+                    "周六"
+                ],
+                "monthNames": [
+                    "一月",
+                    "二月",
+                    "三月",
+                    "四月",
+                    "五月",
+                    "六月",
+                    "七月",
+                    "八月",
+                    "九月",
+                    "十月",
+                    "十一月",
+                    "十二月"
+                ],
+                "firstDay": 1
+            },
+            timePicker: true,
+            timePicker24Hour: true,
+            timePickerSeconds: true
+        };
+    }
     Grid.defaults = {
         autoLoad: true,
         pageNum: 1,
@@ -582,66 +634,34 @@
                                 }
                             } else if (item.type == "datepicker") {
                                 var dateTmpl = '<div class="input-group input-medium">'
-                                    + '<input type="text" role="date-input" id="${id_}" name=${name_} class="form-control">'
+                                    + '<input type="text" role="date-input" id="${id_}" name=${name_} value="${value_}" class="form-control">'
                                     + '<span role="icon" class="input-group-addon">'
-                                    + '<i class="fa fa-calendar"></i>'
-                                    + '</span></div>';
-                                var ele = $
-                                    .tmpl(
-                                        dateTmpl,
-                                        {
-                                            "id_": (item.id == undefined ? item.name
-                                                : item.id),
-                                            "name_": item.name,
-                                            "cls_": item.cls == undefined ? ""
-                                                : item.cls
-                                        });
-                                var min = '';
-                                var min = '';
-                                if (item.min != undefined) {
-                                    min = "'" + item.min + "'";
+                                    + '<i class="glyphicon glyphicon-calendar fa fa-calendar"></i>' + '</span></div>';
+                                if (typeof(moment) == "undefined") {
+                                    return $.tmpl(dateTmpl, {
+                                        "id_": (item.id == undefined ? item.name : item.id),
+                                        "name_": item.name,
+                                        "cls_": item.cls == undefined ? "" : item.cls,
+                                        "value_": ""
+                                    });
                                 }
-                                var max = "";
-                                if (item.max != undefined) {
-                                    max = "'" + item.max + "'";
-                                }
+                                var ele = $.tmpl(dateTmpl, {
+                                    "id_": (item.id == undefined ? item.name : item.id),
+                                    "name_": item.name,
+                                    "cls_": item.cls == undefined ? "" : item.cls,
+                                    "value_": (item.value == undefined ? moment().format('YYYY-MM-DD HH:mm:ss') : item.value)
+                                });
                                 itemDiv.find(".form-group").append(ele);
-                                ele
-                                    .find('[role="date-input"]')
-                                    .on(
-                                        "click",
-                                        function () {
-                                            if (item.minDatepickerId != undefined) {
-                                                var ite = $('#' + item.minDatepickerId).val();
-                                                min = ite;
-                                            }
-                                            if (item.maxDatepickerId != undefined) {
-                                                var ite = $('#' + item.maxDatepickerId).val();
-                                                max = ite;
-                                            }
-                                            laydate({
-                                                istime: true,
-                                                format: 'YYYY-MM-DD hh:mm:ss',
-                                                elem: '#'
-                                                + (item.id == undefined ? item.name
-                                                    : item.id),
-                                                min: min,
-                                                max: max
-                                            });
-                                        });
-                                ele
-                                    .find('[role="icon"]')
-                                    .on(
-                                        "click",
-                                        function () {
-                                            laydate({
-                                                istime: true,
-                                                format: 'YYYY-MM-DD hh:mm:ss',
-                                                elem: '#date'
-                                                + (item.id == undefined ? item.name
-                                                    : item.id)
-                                            });
-                                        });
+                                var config = (item.config == undefined ? {} : item.config);
+                                var option = $.extend(true, dateDefaults, config);
+                                if (item.callback != undefined) {
+                                    ele.find('[role="date-input"]').daterangepicker(option, item.callback);
+                                } else {
+                                    ele.find('[role="date-input"]').daterangepicker(option);
+                                }
+                                ele.find('span').on("click", function () {
+                                    $(this).prev().click();
+                                });
                             }
                             searchFormRow.find(".row").append(itemDiv);
                         });
@@ -796,17 +816,22 @@
             });
             var listRow = $.tmpl(Grid.statics.listRowTmpl, {});
             var div = $('<div class="catlist"></div>');
+            if (that._grids != undefined && that._grids != null) {
+                if (that._grids.length == 0){
+                    div.append('<div style="text-align: center;">暂无数据!</div>');
+                }
+            }
             $.each(that._grids, function (i, grid) {
                 var num = (that._pageNum - 1) * that._pageSize + i + 1;
                 var ele = $('<dl>' +
                     '<dt>' +
                     '<img role="img" src="../../themes/default/img/128.png" alt="Product image" width="128" height="128" />' +
-                    '<strong><span role="cb"></span></strong>' +
+                    '<strong><span class="pull-right">' + num + '</span><span role="cb"></span></strong>' +
                     '<a href="javacript:void(0);" role="hd"></a>' +
                     '</dt>' +
                     '<dd role="data">' +
                     '</dd>' +
-                    '<dd><div class="pull-left"><span>' + num + '</span></div><div class="pull-right" role="btn-g"></div>' +
+                    '<dd><div class="pull-right" role="btn-g"></div>' +
                     '</dd>' +
                     '</dl>');
                 if (that._showCheck) {
@@ -825,7 +850,7 @@
                         ele.find("a[role=hd]").text(grid[that._idField]);
                     }
                     if (that._imgField != undefined && that._imgField == column.field) {
-                        ele.find("img[role=img]").attr("src",html);
+                        ele.find("img[role=img]").attr("src", html);
                     }
                     if (column.field == that._headField) {
                         ele.find("a[role=hd]").text(html);
@@ -878,6 +903,11 @@
             });
             var cardRow = $.tmpl(Grid.statics.cardRowTmpl, {});
             var row = $('<div class="row"></div>');
+            if (that._grids != undefined && that._grids != null) {
+                if (that._grids.length == 0){
+                    row.append('<div style="text-align: center;">暂无数据!</div>');
+                }
+            }
             $.each(that._grids, function (i, grid) {
                 var num = (that._pageNum - 1) * that._pageSize + i + 1;
                 var ele = $('<div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">' +
