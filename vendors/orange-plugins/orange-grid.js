@@ -817,8 +817,8 @@
             var listRow = $.tmpl(Grid.statics.listRowTmpl, {});
             var div = $('<div class="catlist"></div>');
             if (that._grids != undefined && that._grids != null) {
-                if (that._grids.length == 0){
-                    div.append('<div style="text-align: center;">暂无数据!</div>');
+                if (that._grids.length == 0) {
+                    div.append('<dl><dd><p style="text-align: center;">暂无数据!</p></dd></dl>');
                 }
             }
             $.each(that._grids, function (i, grid) {
@@ -826,7 +826,7 @@
                 var ele = $('<dl>' +
                     '<dt>' +
                     '<img role="img" src="../../themes/default/img/128.png" alt="Product image" width="128" height="128" />' +
-                    '<strong><span class="pull-right">' + num + '</span><span role="cb"></span></strong>' +
+                    '<strong><span role="cb"></span></strong>' +
                     '<a href="javacript:void(0);" role="hd"></a>' +
                     '</dt>' +
                     '<dd role="data">' +
@@ -849,7 +849,7 @@
                     if (that._headField == undefined) {
                         ele.find("a[role=hd]").text(grid[that._idField]);
                     }
-                    if (that._imgField != undefined && that._imgField == column.field) {
+                    if (that._imgField != undefined && that._imgField != null && grid[that._imgField] != undefined) {
                         ele.find("img[role=img]").attr("src", html);
                     }
                     if (column.field == that._headField) {
@@ -904,8 +904,8 @@
             var cardRow = $.tmpl(Grid.statics.cardRowTmpl, {});
             var row = $('<div class="row"></div>');
             if (that._grids != undefined && that._grids != null) {
-                if (that._grids.length == 0){
-                    row.append('<div style="text-align: center;">暂无数据!</div>');
+                if (that._grids.length == 0) {
+                    row.append('<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12"><div style="text-align: center;" class="thumbnail">暂无数据!</div></div>');
                 }
             }
             $.each(that._grids, function (i, grid) {
