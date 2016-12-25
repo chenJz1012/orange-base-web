@@ -191,7 +191,7 @@
                 this.$element.append(this.$returnFolder);
             }
             this.files = [];
-            $.blockUI();
+            that.manager.$element.block();
             //load files
             $.ajax({
                 type: "POST",
@@ -216,7 +216,7 @@
                     } else {
                         alert(data.message);
                     }
-                    $.unblockUI();
+                    that.manager.$element.unblock();
                 }
             });
         },

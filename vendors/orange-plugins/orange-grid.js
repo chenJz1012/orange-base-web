@@ -166,8 +166,11 @@
             if (options.headField != undefined) {
                 this._headField = options.headField;
             }
+            if (options.imgField != undefined) {
+                this._imgField = options.imgField;
+            }
             this._contentType = options.contentType;
-            this._showCheck = options.showCheck;
+            this._showCheck = options.showCheckbox;
             this._checkboxWidth = options.checkboxWidth;
             this._showIndexNum = options.showIndexNum;
             this._indexNumWidth = options.indexNumWidth;
@@ -792,22 +795,25 @@
                 format_array.push(column.format);
             });
             var listRow = $.tmpl(Grid.statics.listRowTmpl, {});
-            var ul = $('<ul class="event-list"></ul>');
+            var div = $('<div class="catlist"></div>');
             $.each(that._grids, function (i, grid) {
                 var num = (that._pageNum - 1) * that._pageSize + i + 1;
-                var ele = $('<li>' +
-                    '<time>' +
-                    '<span class="day">' + num + '</span>' +
-                    '</time>' +
-                    '<div class="info">' +
-                    '<h2 class="title" role="hd"></h2>' +
-                    '<div style="padding-left: 10px;" role="data">' +
-                    '</div>' +
-                    '<ul role="btn-g">' +
-                    '</ul>' +
-                    '</div>' +
-                    '</li>');
-
+                var ele = $('<dl>' +
+                    '<dt>' +
+                    '<img role="img" src="../../themes/default/img/128.png" alt="Product image" width="128" height="128" />' +
+                    '<strong><span role="cb"></span></strong>' +
+                    '<a href="javacript:void(0);" role="hd"></a>' +
+                    '</dt>' +
+                    '<dd role="data">' +
+                    '</dd>' +
+                    '<dd><div class="pull-left"><span>' + num + '</span></div><div class="pull-right" role="btn-g"></div>' +
+                    '</dd>' +
+                    '</dl>');
+                if (that._showCheck) {
+                    var checkbox = $('<input type="checkbox" class="checkboxes" style="height: 18px;" value="'
+                        + grid[that._idField] + '"/>');
+                    ele.find("span[role=cb]").append(checkbox);
+                }
                 $.each(that._columns, function (j, column) {
                     var title = column.title;
                     var field = column.field;
@@ -816,21 +822,20 @@
                         html = column.format(num, grid);
                     }
                     if (that._headField == undefined) {
-                        ele.find("h2[role=hd]").text(grid[that._idField]);
+                        ele.find("a[role=hd]").text(grid[that._idField]);
+                    }
+                    if (that._imgField != undefined && that._imgField == column.field) {
+                        ele.find("img[role=img]").attr("src",html);
                     }
                     if (column.field == that._headField) {
-                        ele.find("h2[role=hd]").text(html);
+                        ele.find("a[role=hd]").text(html);
                     }
-                    var span = $('<span class="desc"><label>' + title + '</label>  ' + html + '</span>   ');
-                    ele.find("div[role=data]").append(span);
+                    var p = $('<p><label>' + title + '</label>  ' + html + '</p>   ');
+                    ele.find("dd[role=data]").append(p);
                 });
                 if (that._actionColumns != undefined) {
                     var _index = i;
                     var current_data = grid;
-                    var percent = 0;
-                    if (that._actionColumns.length > 0) {
-                        percent = parseFloat(1 / that._actionColumns.length) * 100;
-                    }
                     $.each(that._actionColumns, function (k, colum) {
                         var visible = true;
                         if (colum.visible != undefined) {
@@ -846,19 +851,19 @@
                         if (colum.clsHandle != undefined) {
                             colum.cls = colum.clsHandle(num, current_data);
                         }
-                        var li = $('<li style="width:' + percent + '%;">' + text + '</li>');
+                        var button = $('<button type="button" class="btn ' + colum.cls + '">' + text + '</button>');
                         if (colum.handle != undefined) {
-                            li.click(function (e) {
+                            button.click(function (e) {
                                 colum.handle(num, current_data);
                                 e.stopPropagation();
                             });
                         }
-                        ele.find("ul[role=btn-g]").append(li);
+                        ele.find("div[role=btn-g]").append(button);
                     });
                 }
-                ul.append(ele);
+                div.append(ele);
             });
-            listRow.append(ul);
+            listRow.append(div);
             this.$gridWrapper.append(listRow);
         },
         _renderCard: function () {
