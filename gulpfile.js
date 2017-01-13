@@ -50,7 +50,7 @@ gulp.task('replace', function () {
 });
 
 gulp.task('clean', function () {
-    return gulp.src(outPath).pipe(clean());
+    return gulp.src([outPath, 'rev']).pipe(clean());
 });
 
 gulp.task('build', ['build:js', 'build:css', 'build:cdn'], function () {
