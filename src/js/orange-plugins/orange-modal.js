@@ -1,7 +1,7 @@
 /**
  * Created by chenguojun on 8/29/16.
  */
-;
+
 (function ($, window, document, undefined) {
     var Modal = function (options) {
         this._setVariable(options);
@@ -17,7 +17,7 @@
         backdrop: true,
         scroll: true,
         keyboard: true,
-        width : "80%",
+        width: "80%",
         maxHeight: "580px",
         minHeight: "480px"
     };
@@ -45,12 +45,12 @@
         },
         _setVariable: function (options) {
             this._options = options;
-            this.$modal = new Object();
-            this.$body = new Object();
+            this.$modal = {};
+            this.$body = {};
             this.modalOpts = {};
         },
         _setOptions: function (options) {
-            if (options.id == undefined) {
+            if (options.id === undefined) {
                 this._elementId = "orange_modal_" + new Date().getTime();
             } else {
                 this._elementId = options.id;
@@ -65,16 +65,16 @@
             this._backdrop = options.backdrop;
             this._scroll = options.scroll;
             this._keyboard = options.keyboard;
-            if (options.width != undefined) {
+            if (options.width !== undefined) {
                 this.modalOpts.width = options.width;
             }
-            if (options.height != undefined) {
+            if (options.height !== undefined) {
                 this.modalOpts.height = options.height;
             }
-            if (options.minHeight != undefined) {
+            if (options.minHeight !== undefined) {
                 this.modalOpts.minHeight = options.minHeight;
             }
-            if (options.maxHeight != undefined) {
+            if (options.maxHeight !== undefined) {
                 this.modalOpts.maxHeight = options.maxHeight;
             }
         },
@@ -125,7 +125,7 @@
             this.$body = body.find("div.panel-body");
 
             // footer
-            if (this._buttons != undefined) {
+            if (this._buttons !== undefined) {
                 var footer = $.tmpl(Modal.statics.footerTmpl, {
                     "id_": that._elementId
                 });
@@ -134,15 +134,15 @@
                     if (button.hideModal) {
                         attribute += " data-dismiss=modal ";
                     }
-                    if (button.attribute != undefined) {
+                    if (button.attribute !== undefined) {
                         attribute += button.attribute;
                     }
                     var btn = $.tmpl(Modal.statics.buttonTmpl, {
                         "attrbute_": attribute,
-                        "cls_": button.cls == undefined ? "" : button.cls,
-                        "text_": button.text == undefined ? "未定义" : button.text
+                        "cls_": button.cls === undefined ? "" : button.cls,
+                        "text_": button.text === undefined ? "未定义" : button.text
                     });
-                    if (button.handle != undefined) {
+                    if (button.handle !== undefined) {
                         btn.on("click", function () {
                             button.handle();
                         });

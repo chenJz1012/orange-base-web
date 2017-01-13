@@ -1,7 +1,7 @@
 /**
  * Created by chenguojun on 9/28/16.
  */
-;
+
 (function ($, window, document, undefined) {
     App.menu = {
         "initVerticalMenu": initVerticalMenu,
@@ -11,7 +11,7 @@
     App.menusMapping = {};
     function toggleMenu() {
         var toggle = $.cookie('menu-toggle');
-        if (toggle == undefined) {
+        if (toggle === undefined) {
             toggle = "v";
         }
         if (toggle == "v") {
@@ -45,11 +45,11 @@
     function getTopMenu(menus) {
         var topMenus = [];
         $.each(menus, function (i, m) {
-            if (m.parentId == 0) {
+            if (m.parentId === 0) {
                 topMenus.push(m);
             } else {
                 var subMenus = getMenu(menus, m.parentId);
-                if (subMenus.length == 0) {
+                if (subMenus.length === 0) {
                     topMenus.push(m);
                 }
             }
@@ -64,7 +64,7 @@
                 ele += ('<li data-level="sub">'
                 + '<a data-url="' + m.action
                 + '" data-title="' + m.functionName
-                + '" href="javascript:void(0);"><i class="' + (m.icon == null ? "glyphicon glyphicon-list" : m.icon) + '"></i> '
+                + '" href="javascript:void(0);"><i class="' + (m.icon === null ? "glyphicon glyphicon-list" : m.icon) + '"></i> '
                 + m.functionName
                 + '</a>');
                 var sMenus = getSubMenu(menus, m.id);
@@ -83,7 +83,7 @@
                 ele += ('<li data-level="sub">'
                 + '<a data-url="' + m.action
                 + '" data-title="' + m.functionName
-                + '" href="javascript:void(0);"><i class="' + (m.icon == null ? "glyphicon glyphicon-list" : m.icon) + '"></i> '
+                + '" href="javascript:void(0);"><i class="' + (m.icon === null ? "glyphicon glyphicon-list" : m.icon) + '"></i> '
                 + m.functionName
                 + '</a>');
                 ele += '</li>';
@@ -100,7 +100,7 @@
                 ele += ('<li data-level="sub">'
                 + '<a data-url="' + m.action
                 + '" data-title="' + m.functionName
-                + '" href="javascript:void(0);"><i class="' + (m.icon == null ? "glyphicon glyphicon-list" : m.icon) + '"></i> '
+                + '" href="javascript:void(0);"><i class="' + (m.icon === null ? "glyphicon glyphicon-list" : m.icon) + '"></i> '
                 + m.functionName
                 + '</a>');
                 ele += '</li>';
@@ -131,12 +131,12 @@
                         });
                         var topMenus = getTopMenu(menus);
                         $.each(topMenus, function (i, m) {
-                            if (m.parentId == 0) {
+                            if (m.parentId === 0) {
                                 var ele =
                                     '<li data-level="top">'
                                     + '<a data-url="' + m.action
                                     + '" data-title="' + m.functionName
-                                    + '" href="javascript:void(0);"><i class="' + (m.icon == null ? "glyphicon glyphicon-list" : m.icon) + '"></i> '
+                                    + '" href="javascript:void(0);"><i class="' + (m.icon === null ? "glyphicon glyphicon-list" : m.icon) + '"></i> '
                                     + m.functionName
                                     + '</a>';
                                 var subMenus = getSubMenu(menus, m.id);
@@ -154,7 +154,7 @@
                             .each(function () {
                                     var url = $(this).attr("data-url");
                                     var f = App.requestMapping[url];
-                                    if (f != undefined) {
+                                    if (f !== undefined) {
                                         $(this).on("click", function () {
                                             window.location.href = App.href + '/index.html?u=' + url;
                                         });
@@ -193,7 +193,7 @@
                             App.menusMapping[m.action] = m.functionName;
                         });
                         $.each(topMenus, function (i, m) {
-                            if (m.parentId == 0) {
+                            if (m.parentId === 0) {
                                 var subMenus = getSubMenu(menus, m.id);
                                 var dropDown = "";
                                 var toggle = "";
@@ -223,7 +223,7 @@
                             .each(function () {
                                     var url = $(this).attr("data-url");
                                     var f = App.requestMapping[url];
-                                    if (f != undefined) {
+                                    if (f !== undefined) {
                                         $(this).on("click", function () {
                                             window.location.href = App.href + '/index.html?u=' + url;
                                         });
@@ -245,13 +245,13 @@
     var refreshHref = function (ul) {
         var location = window.location.href;
         var url = location.substring(location.lastIndexOf("?u=") + 3);
-        if (location.lastIndexOf("?u=") > 0 && url != undefined && $.trim(url) != "") {
+        if (location.lastIndexOf("?u=") > 0 && url !== undefined && $.trim(url) != "") {
             var title = App.menusMapping[url];
             var f = App.requestMapping[url];
-            if (f != undefined) {
+            if (f !== undefined) {
                 App[f].page(title);
                 var a;
-                if (App.toggle ==undefined || App.toggle == "v") {
+                if (App.toggle == undefined || App.toggle == "v") {
                     a = $(ul).find("li[class!=dropdown] > a[data-url='" + url + "']");
                     a.parent().siblings("li").removeClass("active");
                     a.parent().parent().parent().siblings("li").removeClass("active");
@@ -274,7 +274,7 @@
             window.location.reload();
         });
         var toggle = App.toggle = $.cookie('menu-toggle');
-        if (toggle == undefined) {
+        if (toggle === undefined) {
             toggle = "v";
         }
         if (toggle == "v") {

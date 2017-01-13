@@ -1,7 +1,7 @@
 /**
  * Created by chenguojun on 8/10/16.
  */
-;
+
 (function ($, window, document, undefined) {
     function initLogin() {
         $('#username,#password').bind('keypress', function (event) {
@@ -13,7 +13,7 @@
     }
 
     var login = function () {
-        if ($("#username").val() == "" || $("#username").val() == "password") {
+        if ($("#username").val() === "" || $("#username").val() == "password") {
             alert("登录名或密码不能为空!")
         }
         var fields = JSON.stringify(
@@ -39,7 +39,7 @@
 
             }
         });
-    }
+    };
     $(document).ready(function () {
         initLogin();
     });

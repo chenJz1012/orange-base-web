@@ -1,7 +1,7 @@
 /**
  * Created by chenguojun on 8/29/16.
  */
-;
+
 (function ($, window, document, undefined) {
 
     var KE;
@@ -70,7 +70,7 @@
     var Form = function (element, options, callback) {
         this._setVariable(element, options);
         this._setOptions(this._options);
-        if (callback != undefined) {
+        if (callback !== undefined) {
             this._callback = callback;
         }
         this._init();
@@ -120,8 +120,8 @@
         },
         loadRemote: function (ajaxUrl, callback, method) {
             var that = this;
-            if (method == undefined)
-                method = "GET"
+            if (method === undefined)
+                method = "GET";
             $.ajax({
                 type: method,
                 dataType: "json",
@@ -135,7 +135,7 @@
                         $.each(this._data, function (i, item) {
                             that._loadValue(i, item);
                         });
-                        if (callback != undefined) {
+                        if (callback !== undefined) {
                             callback();
                         }
                     } else {
@@ -154,10 +154,10 @@
             this._alert(alertText, "danger", 5);
         },
         _alert: function (alertText, type, seconds) {
-            if (type == undefined) {
+            if (type === undefined) {
                 type = "danger";
             }
-            if (seconds == undefined) {
+            if (seconds === undefined) {
                 seconds = 3;
             }
             var alertDiv = $.tmpl(Form.statics.alertTmpl, {
@@ -171,24 +171,24 @@
         _setVariable: function (element, options) {
             this.$element = $(element);
             var id = element.id;
-            if (id == undefined) {
+            if (id === undefined) {
                 id = "orange_form_" + new Date().getTime();
                 this.$element.attr("id", id);
             }
             this._elementId = id;
             this._options = options;
-            this._editor = new Array();
-            this._module = new Array();
+            this._editor = [];
+            this._module = [];
             this.$form = undefined;
             this._data = undefined;
         },
         _setOptions: function (options) {
-            if (options.id == undefined) {
+            if (options.id === undefined) {
                 this._formId = "form_" + new Date().getTime();
             } else {
                 this._formId = options.id;
             }
-            if (options.name == undefined) {
+            if (options.name === undefined) {
                 this._formName = "form_" + new Date().getTime();
             } else {
                 this._formName = options.name;
@@ -210,7 +210,7 @@
             this._showReset = options.showReset;
             this._complete = options.complete;
             this._isValidate = options.isValidate;
-            if (options.validateOptions != undefined) {
+            if (options.validateOptions !== undefined) {
                 this._validateOptions = options.validateOptions;
             } else {
                 this._validateOptions = {
@@ -243,14 +243,14 @@
 
             // formAction
             var formAction = $.tmpl(Form.statics.formActionTmpl, {
-                "align_": that._buttonsAlign == undefined ? "left"
+                "align_": that._buttonsAlign === undefined ? "left"
                     : that._buttonsAlign
             });
             this.$form.append(formAction);
             this._renderActionButtons(formAction);
         },
         _renderFormElements: function (formBody) {
-            if (this._items == undefined || this._items.length == 0) {
+            if (this._items === undefined || this._items.length == 0) {
                 return;
             }
             var that = this;
@@ -268,7 +268,7 @@
                 .each(
                     this._items,
                     function (i, item) {
-                        if (that._formEles[item.type] != undefined) {
+                        if (that._formEles[item.type] !== undefined) {
                             if (item.type == "hidden") {
                                 var ele = that._formEles[item.type]
                                 (item);
@@ -299,10 +299,10 @@
                             row.append(wrapper);
 
                             // validate
-                            if (item.rule != undefined) {
+                            if (item.rule !== undefined) {
                                 that._validateOptions.rules[item.name] = item.rule;
                             }
-                            if (item.message != undefined) {
+                            if (item.message !== undefined) {
                                 that._validateOptions.messages[item.name] = item.message;
                             }
 
@@ -329,11 +329,11 @@
             var ele = this._formEles[item.type](item, this);
             var label = $.tmpl(Form.statics.labelTmpl, {
                 "cls_": that._labelInline ? "col-md-2" : "",
-                "label_": item.label == undefined ? "" : item.label
+                "label_": item.label === undefined ? "" : item.label
             });
             wrapper.find(".form-group").append(label);
             var help;
-            if (item.detail != undefined) {
+            if (item.detail !== undefined) {
                 help = $.tmpl(Form.statics.blockSpanTmpl, {
                     "help_": ""
                 });
@@ -344,11 +344,11 @@
                 if (item.showIcon) {
                     item.icon = "";
                 }
-                if (item.icon != undefined) {
+                if (item.icon !== undefined) {
                     var iconDiv = $('<div class="input-icon '
-                        + (item.iconAlign == undefined ? "right"
+                        + (item.iconAlign === undefined ? "right"
                             : item.iconAlign) + '"></div>');
-                    if (item.cls != undefined) {
+                    if (item.cls !== undefined) {
                         iconDiv.addClass(item.cls);
                     }
                     var icon = $('<i class="' + item.icon + '"></i>');
@@ -358,30 +358,30 @@
                 } else {
                     div.append(ele);
                 }
-                if (help != undefined) {
+                if (help !== undefined) {
                     div.append(help);
                 }
                 wrapper.find(".form-group").append(div);
             } else {
-                if (item.icon != undefined) {
+                if (item.icon !== undefined) {
                     var iconDiv = $('<div formele="' + item.type + '" class="input-icon '
-                        + (item.iconAlign == undefined ? "right"
+                        + (item.iconAlign === undefined ? "right"
                             : item.iconAlign) + '"></div>');
-                    if (item.cls != undefined) {
+                    if (item.cls !== undefined) {
                         iconDiv.addClass(item.cls);
                     }
                     var icon = $('<i class="' + item.icon + '"></i>');
                     iconDiv.append(icon);
                     iconDiv.append(ele);
                     wrapper.find(".form-group").append(iconDiv);
-                    if (help != undefined) {
+                    if (help !== undefined) {
                         wrapper.find(".form-group").append(help);
                     }
                 } else {
                     var inputWrapper = $('<div formele="' + item.type + '"></div>')
                     inputWrapper.append(ele);
                     wrapper.find(".form-group").append(inputWrapper);
-                    if (help != undefined) {
+                    if (help !== undefined) {
                         wrapper.find(".form-group").append(help);
                     }
                 }
@@ -416,18 +416,18 @@
                 formAction.append(submitBtn);
                 submitBtn.after("&nbsp;");
             }
-            if (this._buttons != undefined && this._buttons.length > 0) {
+            if (this._buttons !== undefined && this._buttons.length > 0) {
                 $.each(this._buttons, function (i, button) {
                     var btn = $.tmpl(Form.statics.buttonTmpl, {
-                        "type_": button.type == undefined ? "button"
+                        "type_": button.type === undefined ? "button"
                             : button.type,
-                        "attribute_": button.attribute == undefined ? ""
+                        "attribute_": button.attribute === undefined ? ""
                             : button.attribute,
-                        "cls_": button.cls == undefined ? "btn-default "
+                        "cls_": button.cls === undefined ? "btn-default "
                             : button.cls,
                         "text_": button.text
                     });
-                    if (button.handle != undefined) {
+                    if (button.handle !== undefined) {
                         btn.on("click", function () {
                             button.handle();
                         });
@@ -441,13 +441,13 @@
             'html': function (data, form) {
                 var htmlWrapper = '<div id="${id_}" name="${name_}" ${attribute_} ></div>';
                 var ele = $.tmpl(htmlWrapper, {
-                    "id_": (data.id == undefined ? data.name : data.id),
+                    "id_": (data.id === undefined ? data.name : data.id),
                     "name_": data.name,
-                    "attribute_": (data.attribute == undefined ? ""
+                    "attribute_": (data.attribute === undefined ? ""
                         : data.attribute)
                 });
                 ele.append(data.html);
-                if (data.loadHandle != undefined) {
+                if (data.loadHandle !== undefined) {
                     ele.data("load", data.loadHandle);
                 }
                 return ele;
@@ -455,9 +455,9 @@
             'display': function (data, form) {
                 var textTmpl = '<p id="${id_}" name="${name_}" ${attribute_} class="form-control-static"></p>';
                 var ele = $.tmpl(textTmpl, {
-                    "id_": (data.id == undefined ? data.name : data.id),
+                    "id_": (data.id === undefined ? data.name : data.id),
                     "name_": data.name,
-                    "attribute_": (data.attribute == undefined ? ""
+                    "attribute_": (data.attribute === undefined ? ""
                         : data.attribute)
                 });
                 ele.data("format", data.format);
@@ -466,9 +466,9 @@
             'hidden': function (data, form) {
                 var textTmpl = '<input type="hidden" id="${id_}" name="${name_}" class="form-control" ${attribute_}>';
                 var ele = $.tmpl(textTmpl, {
-                    "id_": (data.id == undefined ? data.name : data.id),
+                    "id_": (data.id === undefined ? data.name : data.id),
                     "name_": data.name,
-                    "attribute_": (data.attribute == undefined ? ""
+                    "attribute_": (data.attribute === undefined ? ""
                         : data.attribute)
                 });
                 return ele;
@@ -476,17 +476,17 @@
             'text': function (data, form) {
                 var textTmpl = '<input type="text" showicon=${showIcon_} id="${id_}" name="${name_}" class="form-control ${cls_}" ${readonly_} ${disabled_} ${attribute_} placeholder="${placeholder_}">';
                 var ele = $.tmpl(textTmpl, {
-                    "id_": (data.id == undefined ? data.name : data.id),
+                    "id_": (data.id === undefined ? data.name : data.id),
                     "name_": data.name,
-                    "showIcon_": data.showIcon == undefined ? false
+                    "showIcon_": data.showIcon === undefined ? false
                         : data.showIcon,
-                    "placeholder_": (data.placeholder == undefined ? ""
+                    "placeholder_": (data.placeholder === undefined ? ""
                         : data.placeholder),
-                    "cls_": data.cls == undefined ? ""
-                        : (data.icon != undefined ? "" : data.cls),
+                    "cls_": data.cls === undefined ? ""
+                        : (data.icon !== undefined ? "" : data.cls),
                     "readonly_": (data.readonly ? "readonly" : ""),
                     "disabled_": (data.disabled ? "disabled" : ""),
-                    "attribute_": (data.attribute == undefined ? ""
+                    "attribute_": (data.attribute === undefined ? ""
                         : data.attribute)
                 });
                 return ele;
@@ -494,15 +494,15 @@
             'password': function (data, form) {
                 var passwordTmpl = '<input type="password" id="${id_}" name="${name_}" class="form-control ${cls_}" ${readonly_} ${disabled_} ${attribute_} placeholder="${placeholder_}">';
                 var ele = $.tmpl(passwordTmpl, {
-                    "id_": (data.id == undefined ? data.name : data.id),
+                    "id_": (data.id === undefined ? data.name : data.id),
                     "name_": data.name,
-                    "placeholder_": (data.placeholder == undefined ? ""
+                    "placeholder_": (data.placeholder === undefined ? ""
                         : data.placeholder),
-                    "cls_": data.cls == undefined ? ""
-                        : (data.icon != undefined ? "" : data.cls),
+                    "cls_": data.cls === undefined ? ""
+                        : (data.icon !== undefined ? "" : data.cls),
                     "readonly_": (data.readonly ? "readonly" : ""),
                     "disabled_": (data.disabled ? "disabled" : ""),
-                    "attribute_": (data.attribute == undefined ? ""
+                    "attribute_": (data.attribute === undefined ? ""
                         : data.attribute)
                 });
                 return ele;
@@ -510,13 +510,13 @@
             'textarea': function (data, form) {
                 var textareaTmpl = '<textarea id="${id_}" name="${name_}" class="form-control ${cls_}" ${readonly_} ${disabled_} ${attribute_} rows="${rows_}"></textarea>';
                 var ele = $.tmpl(textareaTmpl, {
-                    "id_": (data.id == undefined ? data.name : data.id),
+                    "id_": (data.id === undefined ? data.name : data.id),
                     "name_": data.name,
-                    "rows_": (data.rows == undefined ? "3" : data.rows),
-                    "cls_": data.cls == undefined ? "" : data.cls,
+                    "rows_": (data.rows === undefined ? "3" : data.rows),
+                    "cls_": data.cls === undefined ? "" : data.cls,
                     "readonly_": (data.readonly ? "readonly" : ""),
                     "disabled_": (data.disabled ? "disabled" : ""),
-                    "attribute_": (data.attribute == undefined ? ""
+                    "attribute_": (data.attribute === undefined ? ""
                         : data.attribute)
                 });
                 return ele;
@@ -525,14 +525,14 @@
                 var selectTmpl = '<select id="${id_}" name="${name_}" ${attribute_} ${disabled_} class="form-control ${cls_}"></select>';
                 var optionTmpl = '<option value=${value_} ${selected}>${text_}</option>';
                 var ele = $.tmpl(selectTmpl, {
-                    "id_": (data.id == undefined ? data.name : data.id),
+                    "id_": (data.id === undefined ? data.name : data.id),
                     "name_": data.name,
-                    "cls_": data.cls == undefined ? "" : data.cls,
+                    "cls_": data.cls === undefined ? "" : data.cls,
                     "disabled_": (data.disabled ? "disabled" : ""),
-                    "attribute_": (data.attribute == undefined ? ""
+                    "attribute_": (data.attribute === undefined ? ""
                         : data.attribute)
                 });
-                if (data.items != undefined && data.items.length > 0) {
+                if (data.items !== undefined && data.items.length > 0) {
                     $.each(data.items, function (i, option) {
                         var opt = $.tmpl(optionTmpl, {
                             "value_": option.value,
@@ -542,7 +542,7 @@
                         ele.append(opt);
                     });
                 }
-                if (data.itemsUrl != undefined) {
+                if (data.itemsUrl !== undefined) {
                     $.ajax({
                         type: "POST",
                         dataType: "json",
@@ -568,12 +568,12 @@
                 var wrapperTmpl = '<div id="${id_}_cbg" name="${name_}_cbg" ${attribute_} class="checkbox-list"></div>';
                 var checkboxTmpl = '<label class="${inline_}"><input name="${name_}" value="${value_}" type="checkbox" ${checked_} ${attribute_} ${disabled_} >${text_}</label>';
                 var ele = $.tmpl(wrapperTmpl, {
-                    "id_": (data.id == undefined ? data.name : data.id),
+                    "id_": (data.id === undefined ? data.name : data.id),
                     "name_": data.name,
-                    "attribute_": (data.attribute == undefined ? ""
+                    "attribute_": (data.attribute === undefined ? ""
                         : data.attribute)
                 });
-                if (data.items != undefined && data.items.length > 0) {
+                if (data.items !== undefined && data.items.length > 0) {
                     $.each(
                         data.items,
                         function (i, checkbox) {
@@ -590,14 +590,14 @@
                                             : ""),
                                         "disabled_": (checkbox.disabled ? "disabled"
                                             : ""),
-                                        "attribute_": (checkbox.attribute == undefined ? ""
+                                        "attribute_": (checkbox.attribute === undefined ? ""
                                             : checkbox.attribute)
                                     });
                             ele.append(cb);
                         }
                     );
                 }
-                if (data.itemsUrl != undefined) {
+                if (data.itemsUrl !== undefined) {
                     $
                         .ajax({
                             type: "POST",
@@ -621,7 +621,7 @@
                                                         : ""),
                                                     "disabled_": (checkbox.disabled ? "disabled"
                                                         : ""),
-                                                    "attribute_": (checkbox.attribute == undefined ? ""
+                                                    "attribute_": (checkbox.attribute === undefined ? ""
                                                         : checkbox.attribute)
                                                 });
                                         ele.append(cb);
@@ -640,12 +640,12 @@
                 var wrapperTmpl = '<div class="radio-list"></div>';
                 var radioTmpl = '<label class="radio ${inline_}"><input name="${name_}" value="${value_}" type="radio" ${checked_} ${attribute_}>${text_}</label>';
                 var ele = $.tmpl(wrapperTmpl, {
-                    "id_": (data.id == undefined ? data.name : data.id),
+                    "id_": (data.id === undefined ? data.name : data.id),
                     "name_": data.name,
-                    "attribute_": (data.attribute == undefined ? ""
+                    "attribute_": (data.attribute === undefined ? ""
                         : data.attribute)
                 });
-                if (data.items != undefined && data.items.length > 0) {
+                if (data.items !== undefined && data.items.length > 0) {
                     $.each(data.items, function (i, radio) {
                         var rd = $.tmpl(radioTmpl, {
                             "inline_": data.inline ? inlineCls : "",
@@ -653,13 +653,13 @@
                             "value_": radio.value,
                             "text_": radio.text,
                             "checked_": (radio.checked ? "checked=checked" : ""),
-                            "attribute_": (radio.attribute == undefined ? ""
+                            "attribute_": (radio.attribute === undefined ? ""
                                 : radio.attribute)
                         });
                         ele.append(rd);
                     });
                 }
-                if (data.itemsUrl != undefined) {
+                if (data.itemsUrl !== undefined) {
                     $
                         .ajax({
                             type: "POST",
@@ -682,7 +682,7 @@
                                                         "text_": radio.text,
                                                         "checked_": (radio.checked ? "checked=checked"
                                                             : ""),
-                                                        "attribute_": (radio.attribute == undefined ? ""
+                                                        "attribute_": (radio.attribute === undefined ? ""
                                                             : radio.attribute)
                                                     });
                                             ele.append(rd);
@@ -701,21 +701,21 @@
                     + '<i class="glyphicon glyphicon-calendar fa fa-calendar"></i>' + '</span></div>';
                 if (typeof(moment) == "undefined") {
                     return $.tmpl(dateTmpl, {
-                        "id_": (data.id == undefined ? data.name : data.id),
+                        "id_": (data.id === undefined ? data.name : data.id),
                         "name_": data.name,
-                        "cls_": data.cls == undefined ? "" : data.cls,
+                        "cls_": data.cls === undefined ? "" : data.cls,
                         "value_": ""
                     });
                 }
                 var ele = $.tmpl(dateTmpl, {
-                    "id_": (data.id == undefined ? data.name : data.id),
+                    "id_": (data.id === undefined ? data.name : data.id),
                     "name_": data.name,
-                    "cls_": data.cls == undefined ? "" : data.cls,
-                    "value_": (data.value == undefined ? moment().format('YYYY-MM-DD HH:mm:ss') : data.value)
+                    "cls_": data.cls === undefined ? "" : data.cls,
+                    "value_": (data.value === undefined ? moment().format('YYYY-MM-DD HH:mm:ss') : data.value)
                 });
-                config = (data.config == undefined ? {} : data.config);
+                config = (data.config === undefined ? {} : data.config);
                 var option = $.extend(true, dateDefaults, config);
-                if (data.callback != undefined) {
+                if (data.callback !== undefined) {
                     ele.find('[role="date-input"]').daterangepicker(option, data.callback);
                 } else {
                     ele.find('[role="date-input"]').daterangepicker(option);
@@ -739,10 +739,10 @@
                     + '<a href="javascript:;" class="input-group-addon btn btn-danger fileinput-exists" data-dismiss="fileinput">删除 </a>'
                     + '</div></div></div>';
                 var ele = $.tmpl(fileTmpl, {
-                    "id_": (data.id == undefined ? data.name : data.id),
+                    "id_": (data.id === undefined ? data.name : data.id),
                     "name_": data.name
                 });
-                if (data.uploadUrl == undefined) {
+                if (data.uploadUrl === undefined) {
                     data.uploadUrl = App.href + "/api/common/uploadFile" + "?orange_token=" + App.token
                 } else {
                     if (data.uploadUrl.indexOf("orange_token=") == -1) {
@@ -769,11 +769,11 @@
                                 success: function (json, status) {
                                     if (json.code === 200) {
                                         json = json.data;
-                                        if (data.onSuccess != undefined) {
+                                        if (data.onSuccess !== undefined) {
                                             data.onSuccess(json);
                                             successIcon.show();
                                         } else {
-                                            if (json.attachmentUrl != undefined) {
+                                            if (json.attachmentUrl !== undefined) {
                                                 ele.find("[role='file-input']")
                                                     .attr("value", json.attachmentUrl);
                                                 successIcon.show();
@@ -807,7 +807,7 @@
                     ele.find(".input-group").append(successIcon);
                     ele.find('[data-dismiss="fileinput"]').click(function () {
                         form._refreshItem(data.name);
-                        if (data.deleteHandle != undefined) {
+                        if (data.deleteHandle !== undefined) {
                             data.deleteHandle();
                         }
                     });
@@ -823,18 +823,18 @@
                     + '  <input type="file" role="fileuploadInput" id="fileupload_${id_}" name="files[]" multiple="">'
                     + '  </span>';
                 var btn = $.tmpl(filesTmpl, {
-                    "id_": (data.id == undefined ? data.name : data.id)
+                    "id_": (data.id === undefined ? data.name : data.id)
                 });
                 btn.find("input[role=fileuploadInput]").data("data", data);
                 var tableTmpl = '<table id="file_table_${id_}" name="'
                     + data.name + '" role="presentation" class="table table-striped clearfix"><tbody class="files"></tbody></table>';
                 var table = $.tmpl(tableTmpl, {
-                    "id_": (data.id == undefined ? data.name : data.id)
+                    "id_": (data.id === undefined ? data.name : data.id)
                 });
                 table.data("data", data);
                 var eleTmpl = '<div id="files_div_${id_}" name="files_div_${name_}"></div>';
                 var ele = $.tmpl(eleTmpl, {
-                    "id_": (data.id == undefined ? data.name : data.id),
+                    "id_": (data.id === undefined ? data.name : data.id),
                     "name_": data.name,
                 });
                 ele.append(btn);
@@ -855,10 +855,10 @@
                     + '<a href="javascript:;" class="btn btn-danger fileinput-exists" data-dismiss="fileinput">删除</a>'
                     + '</div></div></div>';
                 var ele = $.tmpl(imageTmpl, {
-                    "id_": (data.id == undefined ? data.name : data.id),
+                    "id_": (data.id === undefined ? data.name : data.id),
                     "name_": data.name
                 });
-                if (data.uploadUrl == undefined) {
+                if (data.uploadUrl === undefined) {
                     data.uploadUrl = App.href + "/api/common/uploadImage" + "?orange_token=" + App.token
                 } else {
                     if (data.uploadUrl.indexOf("orange_token=") == -1) {
@@ -938,10 +938,10 @@
                                         }
 
                                     }
-                                    if (data.onSuccess != undefined) {
+                                    if (data.onSuccess !== undefined) {
                                         data.onSuccess(json);
                                     } else {
-                                        if (json.attachmentUrl != undefined) {
+                                        if (json.attachmentUrl !== undefined) {
                                             ele
                                                 .find(
                                                     "[role='image-input']")
@@ -977,15 +977,15 @@
                 var treeTmp = '<input role="tree_${id_}_input" data-type="tree-input" type="text" id="${id_}" name="${name_}" value="" class="hide"/>'
                     + '<ul id="tree_${id_}" role="tree" class="ztree"></ul>';
                 var ele = $.tmpl(treeTmp, {
-                    "id_": (data.id == undefined ? data.name : data.id),
+                    "id_": (data.id === undefined ? data.name : data.id),
                     "name_": data.name
                 });
-                var chkboxType = data.chkboxType == undefined ? {"Y": "p", "N": "p"} : data.chkboxType;
-                var beforeCheck = data.beforeCheck == undefined ? function () {
+                var chkboxType = data.chkboxType === undefined ? {"Y": "p", "N": "p"} : data.chkboxType;
+                var beforeCheck = data.beforeCheck === undefined ? function () {
                 } : data.beforeCheck;
                 var setting = {
                     check: {
-                        enable: (data.checkable == undefined ? true : data.checkable),
+                        enable: (data.checkable === undefined ? true : data.checkable),
                         chkStyle: data.chkStyle,
                         radioType: "all",
                         chkboxType: chkboxType
@@ -999,7 +999,7 @@
                         enable: true,
                         url: data.url,
                         type: "POST",
-                        data: (data.data == undefined ? {} : data.data),
+                        data: (data.data === undefined ? {} : data.data),
                         autoParam: data.autoParam
                     },
                     callback: {
@@ -1037,7 +1037,7 @@
                                     }
                                 }
                             }
-                            zTree.expandAll(data.expandAll == undefined ? false
+                            zTree.expandAll(data.expandAll === undefined ? false
                                 : data.expandAll);
                         }
                     }
@@ -1048,11 +1048,11 @@
             'kindEditor': function (data, form) {
                 var kindeditorTmpl = '<textarea role="kindEditor" class="form-control" id="${id_}" name="${name_}"></textarea>';
                 var ele = $.tmpl(kindeditorTmpl, {
-                    "id_": (data.id == undefined ? data.name : data.id),
+                    "id_": (data.id === undefined ? data.name : data.id),
                     "name_": data.name
                 });
                 ele.data("width", data.width);
-                ele.data("height", data.height == undefined ? "400px"
+                ele.data("height", data.height === undefined ? "400px"
                     : data.height);
                 return ele;
             }
@@ -1095,7 +1095,7 @@
                         function () {
                             var ele = $(this);
                             var edWith = ele
-                                .data("width") == undefined ? "100%" : ele.data("width");
+                                .data("width") === undefined ? "100%" : ele.data("width");
                             var editor = KE
                                 .create('#' + ele.attr("id"),
                                     {
@@ -1106,7 +1106,7 @@
                                         minWidth: 0,
                                         width: edWith,
                                         height: (ele
-                                            .data("height") == undefined ? '400px' : ele.data("height")),
+                                            .data("height") === undefined ? '400px' : ele.data("height")),
                                         allowFileManager: true,
                                         afterBlur: function () {
                                             this.sync();
@@ -1144,7 +1144,7 @@
                 $.each(files, function (i, file) {
                     var element_data = $(this).data("data");
                     var currentData = {};
-                    if (element_data.uploadUrl != undefined)
+                    if (element_data.uploadUrl !== undefined)
                         uploadUrl = element_data.uploadUrl;
                     if (uploadUrl.indexOf("orange_token") == -1) {
                         if (uploadUrl.indexOf("?") != -1) {
@@ -1161,7 +1161,7 @@
                             previewCrop: true,
                             add: function (e, data) {
                                 var type = getLowCaseType(data.files[0].name);
-                                var allowType = element_data.allowType == undefined ? "" : element_data.allowType;
+                                var allowType = element_data.allowType === undefined ? "" : element_data.allowType;
                                 var flag = false;
                                 if (allowType != null && allowType != "") {
                                     var allows = allowType.split(",");
@@ -1179,7 +1179,7 @@
                                     alert("上传格式限制为：" + allowType);
                                     return false;
                                 }
-                                if (element_data.limit != undefined) {
+                                if (element_data.limit !== undefined) {
                                     var currentLength = $("table[name='" + element_data.fileName + "']").find("tbody.files > tr").length;
                                     if (currentLength >= element_data.limit) {
                                         alert("最多只能上传" + element_data.limit + "个附件！");
@@ -1194,7 +1194,7 @@
                                             "fileName_": data.files[0].name,
                                             "fileSize_": (data.files[0].size / 1000)
                                                 .toFixed(2),
-                                            "attName_": (element_data.name == undefined ? "attrIds"
+                                            "attName_": (element_data.name === undefined ? "attrIds"
                                                 : element_data.name)
                                         });
                                 $("#file_table_" + element_data.id).find("tbody.files").append(templateImpl);
@@ -1217,7 +1217,7 @@
                                 var id = data.result.attachmentId;
                                 var name = data.result.attachmentName;
                                 var url = data.result.attachmentUrl;
-                                if (element_data.convertData != undefined) {
+                                if (element_data.convertData !== undefined) {
                                     var arrays = element_data.convertData(data.result);
                                     id = arrays[0];
                                     name = arrays[1];
@@ -1256,7 +1256,7 @@
             if ($.trim(fileIds) == "")
                 return;
             var ids = fileIds.toString().split(",");
-            var fileInfoUrl = (elementData.fileInfoUrl == undefined ? (App.href + "/api/common/attachment") : elementData.fileInfoUrl);
+            var fileInfoUrl = (elementData.fileInfoUrl === undefined ? (App.href + "/api/common/attachment") : elementData.fileInfoUrl);
             if (fileInfoUrl.indexOf("orange_token=") == -1) {
                 if (fileInfoUrl.indexOf("?") != -1) {
                     fileInfoUrl += ("&orange_token=" + App.token);
@@ -1264,7 +1264,7 @@
                     fileInfoUrl += ("?orange_token=" + App.token);
                 }
             }
-            var dataParam = (elementData.dataParam == undefined ? "attachmentId" : elementData.dataParam);
+            var dataParam = (elementData.dataParam === undefined ? "attachmentId" : elementData.dataParam);
             for (var i in ids) {
                 var dataParamValue = {};
                 dataParamValue[dataParam] = ids[i];
@@ -1298,7 +1298,7 @@
         _initHtmlHandle: function () {
             $("div[formele=html]").each(function () {
                 var data = $(this).parent().parent().data("data");
-                if (data != undefined && data.eventHandle != undefined) {
+                if (data !== undefined && data.eventHandle !== undefined) {
                     data.eventHandle($(this));
                 }
             });
@@ -1372,7 +1372,7 @@
         },
         _submitForm: function () {
             var that = this;
-            if (this._beforeSubmit != undefined) {
+            if (this._beforeSubmit !== undefined) {
                 var result = that._beforeSubmit();
             }
             if (result == false) {
@@ -1390,7 +1390,7 @@
                     dataType: "json",
                     success: function (data) {
                         if (data.code === 200) {
-                            if (that._ajaxSuccess != undefined) {
+                            if (that._ajaxSuccess !== undefined) {
                                 that._ajaxSuccess(data);
                             } else {
                                 alert("表单提交成功");
@@ -1408,10 +1408,10 @@
             }
         },
         _doCallbacks: function () {
-            if (this._complete != undefined) {
+            if (this._complete !== undefined) {
                 this._complete();
             }
-            if (this._callback != undefined) {
+            if (this._callback !== undefined) {
                 this._callback();
             }
         },
@@ -1424,12 +1424,12 @@
                     }
                     ele.attr("value", value);
                     var tree = $.fn.zTree.getZTreeObj("tree_" + ele.attr("id"));
-                    if (tree != undefined) {
+                    if (tree !== undefined) {
                         tree.refresh();
                         tree.reAsyncChildNodes(null, "refresh");
                     }
                 } else if (ele.attr("role") == "image-input") {
-                    if (value != undefined && value != '') {
+                    if (value !== undefined && value != '') {
                         ele.attr("value", value);
                         preview = ele.parent().parent().parent().find(
                             "[role='preview']");
@@ -1481,12 +1481,12 @@
                         ele.val(value);
                         var tree = $.fn.zTree.getZTreeObj("tree_"
                             + ele.attr("id"));
-                        if (tree != undefined) {
+                        if (tree !== undefined) {
                             tree.refresh();
                             tree.reAsyncChildNodes(null, "refresh");
                         }
                     } else if (ele.attr("role") == "image-input") {
-                        if (value != undefined && value != '') {
+                        if (value !== undefined && value != '') {
                             ele.val(value);
                             var preview = ele.parent().parent().parent().find(
                                 "[role='preview']");
@@ -1535,7 +1535,7 @@
                 }
             } else if (ele.is('p')) {
                 var format = ele.data("format");
-                if (format != undefined)
+                if (format !== undefined)
                     value = format(value);
                 ele.text(value);
             } else if (ele.is('table')) {
@@ -1544,24 +1544,24 @@
                 ele.val(value);
             }
             var loadHandle = ele.data("load");
-            if (loadHandle != undefined) {
+            if (loadHandle !== undefined) {
                 loadHandle(ele, value);
             }
             this._uniform();
         },
         _reset: function () {
             var that = this;
-            if (this._data != undefined) {
+            if (this._data !== undefined) {
                 $.each(this._data, function (i, value) {
                     that._loadValue(i, value);
                 });
             } else {
-                if (this.$form != undefined)
+                if (this.$form !== undefined)
                     this.$form[0].reset();
             }
         },
         _reload: function (options) {
-            if (options != undefined) {
+            if (options !== undefined) {
                 this._options = $.extend(true, {}, this._options, options);
                 this._setOptions(this._options, this);
             }

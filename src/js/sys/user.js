@@ -1,7 +1,7 @@
 /**
  * Created by chenguojun on 8/10/16.
  */
-;
+
 (function ($, window, document, undefined) {
     /**
      * 功能菜单 对应 当前的唯一别名
@@ -9,7 +9,7 @@
      */
     var uploadMapping = {
         "/api/sys/user/pageList": "sysUser"
-    }
+    };
     /**
      * 加入全局mapping
      */
@@ -26,7 +26,7 @@
             window.App.content.append(content);
             App.sysUser.initEvents();
         }
-    }
+    };
     /**
      * 初始化事件
      */
@@ -443,5 +443,5 @@
             }
         };
         grid = window.App.content.find("#user_grid").orangeGrid(options);
-    }
+    };
 })(jQuery, window, document);

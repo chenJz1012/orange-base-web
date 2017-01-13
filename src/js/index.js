@@ -1,10 +1,10 @@
 /**
  * Created by chenguojun on 8/10/16.
  */
-;
+
 (function ($, window, document, undefined) {
     var token = $.cookie('tc_t');
-    if (token == undefined) {
+    if (token === undefined) {
         window.location.href = '../login.html';
     }
     App.token = token;

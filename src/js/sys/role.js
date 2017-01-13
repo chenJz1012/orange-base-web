@@ -1,7 +1,7 @@
 /**
  * Created by chenguojun on 8/10/16.
  */
-;
+
 (function ($, window, document, undefined) {
     /**
      * 功能菜单 对应 当前的唯一别名
@@ -9,7 +9,7 @@
      */
     var uploadMapping = {
         "/api/sys/role/pageList": "sysRole"
-    }
+    };
     App.requestMapping = $.extend({}, window.App.requestMapping, uploadMapping);
     App.sysRole = {
         page: function (title) {
@@ -19,7 +19,7 @@
             window.App.content.append(content);
             App.sysRole.initEvents();
         }
-    }
+    };
     App.sysRole.initEvents = function () {
         var grid;
         var options = {
@@ -339,5 +339,5 @@
             }
         };
         grid = window.App.content.find("#role_grid").orangeGrid(options);
-    }
+    };
 })(jQuery, window, document);

@@ -6,12 +6,12 @@
     'use strict';
 
     String.prototype.startWith = function (s) {
-        if (s == null || s == "" || this.length == 0 || s.length > this.length)
+        if (s === null || s === "" || this.length === 0 || s.length > this.length)
             return false;
         return this.substr(0, s.length) == s;
     };
     String.prototype.endWith = function (s) {
-        if (s == null || s == "" || this.length == 0 || s.length > this.length)
+        if (s === null || s === "" || this.length === 0 || s.length > this.length)
             return false;
         return this.substring(this.length - s.length) == s;
     };
@@ -98,7 +98,7 @@
         render: function () {
             this.$element.css("height", this.options.height).addClass("scroller").attr("data-always-visible", 1).attr("data-rail-visible", 1);
             this.contextMenu = this.getContextMenu();
-            if (this.contextMenu != null)
+            if (this.contextMenu !== null)
                 this.$element.parent().append(this.contextMenu.$element);
             this.$pathNav = this.getPathNav(this.currentPath);
             this.$element.append(this.$pathNav);
@@ -115,7 +115,7 @@
             var rootNavLi = $.tmpl(FileManager.tpl.pathNav.rootNavLi);
             rootNavLi.data("path", "");
             navUl.append(rootNavLi);
-            if (path == "") {
+            if (path === "") {
                 rootNavLi.find("i").remove();
                 return navUl;
             }
@@ -186,7 +186,7 @@
             var that = this;
             //load return folder
             this.$element = $.tmpl(FileManager.tpl.Folder.container);
-            if (this.currentPath != "") {
+            if (this.currentPath !== "") {
                 this.$returnFolder = $.tmpl(FileManager.tpl.Folder.folder);
                 this.$element.append(this.$returnFolder);
             }
@@ -206,7 +206,7 @@
                 success: function (data) {
                     if (data.code === 200) {
                         that.currentPath = data.data.currentDirPath;
-                        if (data.data.files != undefined && data.data.files.length > 0) {
+                        if (data.data.files !== undefined && data.data.files.length > 0) {
                             $.each(data.data.files, function (i, file) {
                                 var f = new File(file, that);
                                 that.$element.append(f.$element);
@@ -245,7 +245,7 @@
         },
         listen: function () {
             var that = this;
-            if (this.currentPath != "") {
+            if (this.currentPath !== "") {
                 this.$returnFolder.on("dblclick", $.proxy(this.returnParent, this));
             }
         },
@@ -325,7 +325,7 @@
                 this.$element = $.tmpl(FileManager.tpl.File.file, {
                     "name_": getShortName(this.data.name),
                     "title_": this.data.name,
-                    "icon_": File.icon[prefix] == undefined ? "fa-file-o" : File.icon[prefix]
+                    "icon_": File.icon[prefix] === undefined ? "fa-file-o" : File.icon[prefix]
                 });
             }
             this.$element.data("file", this);
@@ -534,7 +534,7 @@
             }, {
                 text: "压缩",
                 textHandle: function (currentFolder, targetFiles, targetFile) {
-                    if (targetFiles.length == 0) {
+                    if (targetFiles.length === 0) {
                         return "";
                     } else if (targetFiles.length == 1) {
                         if (targetFile.isDirectory) {
@@ -543,12 +543,12 @@
                             return "压缩到\"" + getWithoutPrefix(targetFile.name) + ".zip\"";
                         }
                     } else {
-                        return "压缩到\"" + (currentFolder.name == "" ? "根目录" : currentFolder.name) + ".zip\"";
+                        return "压缩到\"" + (currentFolder.name === "" ? "根目录" : currentFolder.name) + ".zip\"";
                     }
                 },
                 onClick: function (currentFolder, targetFiles, targetFile) {
                     var zipName;
-                    if (targetFiles.length == 0) {
+                    if (targetFiles.length === 0) {
                         return;
                     } else if (targetFiles.length == 1) {
                         if (targetFile.isDirectory) {
@@ -562,7 +562,7 @@
                         $.each(targetFiles, function (i, file) {
                             names.push(file.name);
                         });
-                        zipName = currentFolder.name == "" ? "根目录" : currentFolder.name;
+                        zipName = currentFolder.name === "" ? "根目录" : currentFolder.name;
                         currentFolder.zip(names, zipName);
                     }
                 },
@@ -624,7 +624,7 @@
             var that = this;
             var option = that.manager.options.contextMenuOption;
             var container = $.tmpl(FileManager.tpl.ContextMenu.container, {
-                id: option.id == undefined ? new Date().getTime() : option.id
+                id: option.id === undefined ? new Date().getTime() : option.id
             });
             var menuUl = $.tmpl(FileManager.tpl.ContextMenu.ul);
             $.each(ContextMenu.systemOption.items, function (i, item) {
@@ -632,11 +632,11 @@
                     "text_": item.text
                 });
                 li.data("onclick", item.onClick);
-                if (item.textHandle != undefined) {
+                if (item.textHandle !== undefined) {
                     li.data("textHandle", item.textHandle);
                     li.attr("text-handle", true);
                 }
-                if (item.fileType != undefined) {
+                if (item.fileType !== undefined) {
                     li.data("file-type", item.fileType);
                     li.attr("file-type", true);
                 }
@@ -648,11 +648,11 @@
                         "text_": item.text
                     });
                     li.data("onclick", item.onClick);
-                    if (item.textHandle != undefined) {
+                    if (item.textHandle !== undefined) {
                         li.data("textHandle", item.textHandle);
                         li.attr("text-handle", true);
                     }
-                    if (item.fileType != undefined) {
+                    if (item.fileType !== undefined) {
                         li.data("file-type", item.fileType);
                         li.attr("file-type", true);
                     }
@@ -671,7 +671,7 @@
                     var fileElement = $(e.target).parents("div.tile");
                     if (fileElement.length == 1) {
                         var file = fileElement.data("file");
-                        if (file == undefined)
+                        if (file === undefined)
                             return false;
                         that.targetFile = file;
                         if (file.selected()) {

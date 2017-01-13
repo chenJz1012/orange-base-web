@@ -8,11 +8,14 @@ var sourcemaps = require('gulp-sourcemaps');
 var rev = require('gulp-rev');
 var filter = require('gulp-filter');
 var revReplace = require('gulp-rev-replace');
+var jshint = require('gulp-jshint');
 
 gulp.task("build:js", function () {
     // 改动过的js文件压缩 加md5 放到dist的js目录下面
     gulp.src(['src/js/**/*.js'])
         .pipe(sourcemaps.init())
+        .pipe(jshint())
+        .pipe(jshint.reporter('default'))
         .pipe(uglify())
         .pipe(rev())
         .pipe(sourcemaps.write('../maps'))

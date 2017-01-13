@@ -1,7 +1,7 @@
 /**
  * Created by chenguojun on 8/10/16.
  */
-;
+
 (function ($, window, document, undefined) {
     window.App = {
         href: "http://127.0.0.1",
@@ -23,7 +23,7 @@
                 if (disposition && disposition.indexOf('attachment') !== -1) {
                     var filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
                     var matches = filenameRegex.exec(disposition);
-                    if (matches != null && matches[1]) {
+                    if (matches !== null && matches[1]) {
                         filename = matches[1].replace(/['"]/g, '');
                     }
                 }
@@ -63,7 +63,7 @@
         xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
         xhr.setRequestHeader('X-Auth-Token', App.token);
         xhr.send();
-    }
+    };
 
     App.scrollTo = function (el, offeset) {
         var pos = (el && el.size() > 0) ? el.offset().top : 0;
