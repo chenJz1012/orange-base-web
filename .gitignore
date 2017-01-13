@@ -47,3 +47,8 @@ fabric.properties
 
 .gitignore
 .idea
+/dist/
+/rev/
+/node_modules/
+node_modules/
+src/fonts/
