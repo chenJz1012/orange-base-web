@@ -1,10 +1,10 @@
 /**
  * Created by chenguojun on 8/10/16.
  */
-
+;
 (function ($, window, document, undefined) {
     var token = $.cookie('tc_t');
-    if (token === undefined) {
+    if (token == undefined) {
         window.location.href = '../login.html';
     }
     App.token = token;
@@ -21,7 +21,12 @@
             var content = $('<div class="panel-body" >' +
                 '<div class="row">' +
                 '<div class="col-md-6" id="index_grid"></div> ' +
-                '<div class="col-md-6" id="index_manager"></div> ' +
+                '<div class="col-md-6">' +
+                '<div class="row">' +
+                '<div class="col-md-12" id="index_manager"></div>' +
+                '<div class="col-md-12" id="index_manager2"></div>' +
+                '</div>' +
+                '</div> ' +
                 '</div>' +
                 '</div>');
             App.content.append(content);
@@ -192,6 +197,19 @@
         };
         var form = App.content.find("#index_grid").orangeForm(formOpts);
         var manager = App.content.find("#index_manager").fileManager();
+        var manager2 = App.content.find("#index_manager2").fileManager({
+            title:"oss",
+            url: {
+                folder: App.href + "/api/ossFileManager/folder",
+                createFolder: App.href + "/api/ossFileManager/createFolder",
+                rename: App.href + "/api/ossFileManager/rename",
+                deleteFile: App.href + "/api/ossFileManager/deleteFile",
+                deleteFolder: App.href + "/api/ossFileManager/deleteFolder",
+                download: App.href + "/api/ossFileManager/download",
+                zip: App.href + "/api/ossFileManager/zip",
+                unCompress: App.href + "/api/ossFileManager/unCompress"
+            }
+        });
     };
 
 })(jQuery, window, document);

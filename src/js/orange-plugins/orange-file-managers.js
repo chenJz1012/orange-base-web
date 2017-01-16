@@ -6,12 +6,12 @@
     'use strict';
 
     String.prototype.startWith = function (s) {
-        if (s === null || s === "" || this.length === 0 || s.length > this.length)
+        if (s === null || s === "" || this.length == 0 || s.length > this.length)
             return false;
         return this.substr(0, s.length) == s;
     };
     String.prototype.endWith = function (s) {
-        if (s === null || s === "" || this.length === 0 || s.length > this.length)
+        if (s === null || s === "" || this.length == 0 || s.length > this.length)
             return false;
         return this.substring(this.length - s.length) == s;
     };
@@ -39,28 +39,28 @@
     };
 
     FileManager.default = {
+        "title": "资源管理器",
         "currentPath": "",
         "height": 500,
         "useContextMenu": true,
-        "contextMenuOption": {}
-    };
-
-    FileManager.url = {
-        folder: App.href + "/api/fileManager/files",
-        createFolder: App.href + "/api/fileManager/createFolder",
-        rename: App.href + "/api/fileManager/rename",
-        deleteFile: App.href + "/api/fileManager/deleteFile",
-        deleteFolder: App.href + "/api/fileManager/deleteFolder",
-        download: App.href + "/api/fileManager/download",
-        zip: App.href + "/api/fileManager/zip",
-        unCompress: App.href + "/api/fileManager/unCompress"
+        "contextMenuOption": {},
+        "url": {
+            folder: App.href + "/api/fileManager/folder",
+            createFolder: App.href + "/api/fileManager/createFolder",
+            rename: App.href + "/api/fileManager/rename",
+            deleteFile: App.href + "/api/fileManager/deleteFile",
+            deleteFolder: App.href + "/api/fileManager/deleteFolder",
+            download: App.href + "/api/fileManager/download",
+            zip: App.href + "/api/fileManager/zip",
+            unCompress: App.href + "/api/fileManager/unCompress"
+        }
     };
 
     FileManager.tpl = {
         pathNav: {
             ul: '<ul class="breadcrumb" style="background: none"></ul>',
             li: '<li><a href="javascript:void(0);"><font style="font-size:20px;font-family: Arial, Helvetica, sans-serif;">${nav_}</font></a></li>',
-            rootNavLi: '<li><a href="javascript:void(0);"><font style="font-size:20px;font-family: Arial, Helvetica, sans-serif;">资源根目录</font></a></li>'
+            rootNavLi: '<li><a href="javascript:void(0);"><font style="font-size:20px;font-family: Arial, Helvetica, sans-serif;">${title_}</font></a></li>'
         },
         Folder: {
             container: '<div class="tiles"></div>',
@@ -96,9 +96,9 @@
             return true;
         },
         render: function () {
-            this.$element.css("height", this.options.height).addClass("scroller").attr("data-always-visible", 1).attr("data-rail-visible", 1);
+            this.$element.addClass("scroller").attr("data-always-visible", 1).attr("data-rail-visible", 1);
             this.contextMenu = this.getContextMenu();
-            if (this.contextMenu !== null)
+            if (this.contextMenu != null)
                 this.$element.parent().append(this.contextMenu.$element);
             this.$pathNav = this.getPathNav(this.currentPath);
             this.$element.append(this.$pathNav);
@@ -112,7 +112,9 @@
             var that = this;
             var navUl = $.tmpl(FileManager.tpl.pathNav.ul);
             var path = getSimplePath(currentPath);
-            var rootNavLi = $.tmpl(FileManager.tpl.pathNav.rootNavLi);
+            var rootNavLi = $.tmpl(FileManager.tpl.pathNav.rootNavLi, {
+                "title_": that.options.title
+            });
             rootNavLi.data("path", "");
             navUl.append(rootNavLi);
             if (path === "") {
@@ -165,10 +167,8 @@
         this.manager = manager;
         this.currentPath = getSimplePath(currentPath);
         if (this.currentPath.indexOf("/") != -1) {
-            this.parentPath = currentPath.substring(0, currentPath.lastIndexOf("/"));
             this.name = currentPath.substring(currentPath.lastIndexOf("/") + 1);
         } else {
-            this.parentPath = "";
             this.name = this.currentPath;
         }
         this.files = [];
@@ -186,7 +186,8 @@
             var that = this;
             //load return folder
             this.$element = $.tmpl(FileManager.tpl.Folder.container);
-            if (this.currentPath !== "") {
+            this.$element.css("height", that.manager.options.height);
+            if (this.currentPath != "") {
                 this.$returnFolder = $.tmpl(FileManager.tpl.Folder.folder);
                 this.$element.append(this.$returnFolder);
             }
@@ -196,7 +197,7 @@
             $.ajax({
                 type: "POST",
                 dataType: "json",
-                url: FileManager.url.folder,
+                url: that.manager.options.url.folder,
                 beforeSend: function (request) {
                     request.setRequestHeader("X-Auth-Token", App.token);
                 },
@@ -206,6 +207,7 @@
                 success: function (data) {
                     if (data.code === 200) {
                         that.currentPath = data.data.currentDirPath;
+                        that.parentPath = data.data.moveUpDirPath;
                         if (data.data.files !== undefined && data.data.files.length > 0) {
                             $.each(data.data.files, function (i, file) {
                                 var f = new File(file, that);
@@ -244,18 +246,17 @@
             });
         },
         listen: function () {
-            var that = this;
-            if (this.currentPath !== "") {
+            if (this.currentPath != "") {
                 this.$returnFolder.on("dblclick", $.proxy(this.returnParent, this));
             }
         },
         createFolder: function () {
-            var newFoldeData = {
+            var newFolderData = {
                 name: "新建文件夹",
                 isDirectory: true
             };
-            var folder = new File(newFoldeData, this);
-            this.$element.append(folder.$element);
+            var folder = new File(newFolderData, this);
+            this.$element.prepend(folder.$element);
             folder.namingFolder();
         },
         zip: function (name, zipName) {
@@ -263,7 +264,7 @@
             $.ajax({
                 type: "POST",
                 dataType: "json",
-                url: FileManager.url.zip,
+                url: that.manager.options.url.zip,
                 data: {
                     "folderPath": this.currentPath,
                     "name": name.toString(),
@@ -377,16 +378,23 @@
             var input = $('<input class="form-control" value="' + text + '">');
             this.$element.find(".name").empty().append(input);
             input.on("blur", $.proxy(this.onNameFolder, this));
+            var that = this;
+            input.keypress(function (event) {
+                var c = (event.keyCode ? event.keyCode : event.which);
+                if (c == '13') {
+                    that.onNameFolder();
+                }
+            });
             input.select();
         },
         onNameFolder: function () {
             var folderName = this.$element.find(".name > input").val();
             var that = this;
-            var dirPath = getSimplePath(this.folder.currentPath + "/" + folderName);
+            var dirPath = getSimplePath(this.folder.currentPath.endWith("/") ? (this.folder.currentPath + folderName) : (this.folder.currentPath + "/" + folderName));
             $.ajax({
                 type: "POST",
                 dataType: "json",
-                url: FileManager.url.createFolder,
+                url: that.folder.manager.options.url.createFolder,
                 beforeSend: function (request) {
                     request.setRequestHeader("X-Auth-Token", App.token);
                 },
@@ -401,11 +409,18 @@
             });
         },
         renaming: function () {
+            var that = this;
             this.$element.off("click").off("dblclick");
             var oldName = this.name;
             var input = $('<input class="form-control" value="' + oldName + '">');
             this.$element.find(".name").empty().append(input);
             input.on("blur", $.proxy(this.onRename, this, oldName));
+            input.keypress(function (event) {
+                var c = (event.keyCode ? event.keyCode : event.which);
+                if (c == '13') {
+                    that.onRename(oldName)
+                }
+            });
             input.select();
         },
         onRename: function (oldName) {
@@ -415,7 +430,7 @@
             $.ajax({
                 type: "POST",
                 dataType: "json",
-                url: FileManager.url.rename,
+                url: that.folder.manager.options.url.rename,
                 beforeSend: function (request) {
                     request.setRequestHeader("X-Auth-Token", App.token);
                 },
@@ -436,11 +451,16 @@
         },
         deleteFile: function () {
             var that = this;
-            var filePath = getSimplePath("/" + that.folder.currentPath + "/" + that.name);
+            var filePath = "";
+            if (that.folder.currentPath === "") {
+                filePath = "/" + that.name;
+            } else {
+                filePath = getSimplePath("/" + (that.folder.currentPath.endWith("/") ? that.folder.currentPath + that.name : that.folder.currentPath + "/" + that.name));
+            }
             $.ajax({
                 type: "POST",
                 dataType: "json",
-                url: FileManager.url.deleteFile,
+                url: that.folder.manager.options.url.deleteFile,
                 beforeSend: function (request) {
                     request.setRequestHeader("X-Auth-Token", App.token);
                 },
@@ -457,11 +477,16 @@
         },
         deleteFolder: function () {
             var that = this;
-            var dirPath = getSimplePath("/" + that.folder.currentPath + "/" + that.name);
+            var dirPath = "";
+            if (that.folder.currentPath === "") {
+                dirPath = "/" + that.name;
+            } else {
+                dirPath = getSimplePath("/" + (that.folder.currentPath.endWith("/") ? that.folder.currentPath + that.name : that.folder.currentPath + "/" + that.name));
+            }
             $.ajax({
                 type: "POST",
                 dataType: "json",
-                url: FileManager.url.deleteFolder,
+                url: that.folder.manager.options.url.deleteFolder,
                 beforeSend: function (request) {
                     request.setRequestHeader("X-Auth-Token", App.token);
                 },
@@ -479,7 +504,8 @@
         download: function () {
             var folderPath = getSimplePath(this.folder.currentPath);
             var fileName = this.name;
-            window.open(FileManager.url.download + "?orange_token=" + App.token + "&folderPath=" + folderPath + "&fileName=" + fileName);
+            var that = this;
+            window.open(that.folder.manager.options.url.download + "?orange_token=" + App.token + "&folderPath=" + folderPath + "&fileName=" + fileName);
         },
         unCompress: function () {
             var that = this;
@@ -487,7 +513,7 @@
             $.ajax({
                 type: "POST",
                 dataType: "json",
-                url: FileManager.url.unCompress,
+                url: that.folder.manager.options.url.unCompress,
                 beforeSend: function (request) {
                     request.setRequestHeader("X-Auth-Token", App.token);
                 },
@@ -534,7 +560,7 @@
             }, {
                 text: "压缩",
                 textHandle: function (currentFolder, targetFiles, targetFile) {
-                    if (targetFiles.length === 0) {
+                    if (targetFiles.length == 0) {
                         return "";
                     } else if (targetFiles.length == 1) {
                         if (targetFile.isDirectory) {
@@ -548,7 +574,7 @@
                 },
                 onClick: function (currentFolder, targetFiles, targetFile) {
                     var zipName;
-                    if (targetFiles.length === 0) {
+                    if (targetFiles.length == 0) {
                         return;
                     } else if (targetFiles.length == 1) {
                         if (targetFile.isDirectory) {
@@ -611,6 +637,12 @@
                     currentFolder.createFolder();
                 },
                 showType: "desk"
+            },
+            {
+                text: "上传",
+                onClick: function (currentFolder) {
+                },
+                showType: "desk"
             }
         ]
     };
@@ -642,7 +674,7 @@
                 }
                 menuUl.append(li);
             });
-            if (option.items!=undefined&&option.items.length > 0) {
+            if (option.items !== undefined && option.items.length > 0) {
                 $.each(option.items, function (i, item) {
                     var li = $.tmpl(FileManager.tpl.ContextMenu[item.showType], {
                         "text_": item.text
@@ -728,7 +760,7 @@
                 }
             });
         }
-    }
+    };
 
 
     $.fn.fileManager = function (option, e) {
