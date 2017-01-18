@@ -200,6 +200,7 @@
         var manager2 = App.content.find("#index_manager2").fileManager({
             title:"oss",
             url: {
+                upload: App.href + "/api/ossFileManager/upload",
                 folder: App.href + "/api/ossFileManager/folder",
                 createFolder: App.href + "/api/ossFileManager/createFolder",
                 rename: App.href + "/api/ossFileManager/rename",

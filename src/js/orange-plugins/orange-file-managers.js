@@ -45,6 +45,7 @@
         "useContextMenu": true,
         "contextMenuOption": {},
         "url": {
+            upload: App.href + "/api/fileManager/upload",
             folder: App.href + "/api/fileManager/folder",
             createFolder: App.href + "/api/fileManager/createFolder",
             rename: App.href + "/api/fileManager/rename",
@@ -193,7 +194,6 @@
             }
             this.files = [];
             that.manager.$element.block();
-            //load files
             $.ajax({
                 type: "POST",
                 dataType: "json",
@@ -276,6 +276,68 @@
                     }
                 }
             });
+        },
+        uploadFile: function () {
+            var that = this;
+            var modal = $.orangeModal({
+                id: "uploadFileForm",
+                width: "600",
+                height: "200",
+                title: "上传",
+                destroy: true
+            });
+            var formOpts = {
+                id: "upload_file_form",//表单id
+                name: "upload_file_form",//表单名
+                method: "POST",//表单method
+                action: "",//表单action
+                ajaxSubmit: true,//是否使用ajax提交表单
+                rowEleNum: 1,
+                labelInline: false,
+                showSubmit: false,
+                submitText: "保存",//保存按钮的文本
+                showReset: false,//是否显示重置按钮
+                resetText: "重置",//重置按钮文本
+                isValidate: true,//开启验证
+                buttonsAlign: "center",
+                buttons: [{
+                    type: 'button',
+                    text: '确定',
+                    handle: function () {
+                        $.ajaxFileUpload(
+                            {
+                                url: that.manager.options.url.upload + "?orange_token=" + App.token + "&folderPath=" + that.currentPath,
+                                type: "POST",
+                                secureuri: false,
+                                fileElementId: "file_file_manager_file",
+                                dataType: "json",
+                                success: function (json, status) {
+                                    if (json.code === 200) {
+                                        that.refresh();
+                                        modal.hide();
+                                    } else {
+                                        alert(json.message);
+                                    }
+                                },
+                                error: function (data, status, e) {
+                                    alert(e);
+                                }
+                            }
+                        );
+                    }
+                }],
+                items: [
+                    {
+                        type: 'file',
+                        id: 'file_manager_file',
+                        name: 'file_manager_file',
+                        label: '上传文件',
+                        isAjaxUpload: false
+                    }
+                ]
+            };
+            var form = modal.$body.orangeForm(formOpts);
+            modal.show();
         },
         refresh: function () {
             this.manager.enterFolder(this.currentPath);
@@ -363,7 +425,7 @@
             this.$element.find(".corner,.check").remove();
         },
         selected: function () {
-            return this.$element.hasClass("selected") ? true : false;
+            return !!this.$element.hasClass("selected");
         },
         open: function () {
             alert("打开->" + this.name);
@@ -641,6 +703,7 @@
             {
                 text: "上传",
                 onClick: function (currentFolder) {
+                    currentFolder.uploadFile();
                 },
                 showType: "desk"
             }
@@ -761,7 +824,6 @@
             });
         }
     };
-
 
     $.fn.fileManager = function (option, e) {
         var fileManagers = [];
