@@ -198,7 +198,7 @@
         var form = App.content.find("#index_grid").orangeForm(formOpts);
         var manager = App.content.find("#index_manager").fileManager();
         var manager2 = App.content.find("#index_manager2").fileManager({
-            title:"oss",
+            title: 'oss',
             url: {
                 upload: App.href + "/api/ossFileManager/upload",
                 folder: App.href + "/api/ossFileManager/folder",

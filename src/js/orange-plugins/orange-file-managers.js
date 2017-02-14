@@ -40,6 +40,7 @@
 
     FileManager.default = {
         "title": "资源管理器",
+        "viewType": "icon",//icon list
         "currentPath": "",
         "height": 500,
         "useContextMenu": true,
@@ -70,15 +71,26 @@
             '<div class="tile-object"><div class="name">返回</div></div>' +
             '</div>'
         },
+        TableFolder: {
+            container: '<table class="table table-hover"></table>',
+            folder: '<tr><td><span class="fa fa-folder-open-o"></span></td>'
+            + '<td class="text-right text-nowrap"><button class="btn btn-xs btn-warning">返回</button></td></tr>'
+        },
         File: {
             file: '<div class="tile bg-grey" title="${title_}">' +
             '<div class="tile-body"> <i class="fa ${icon_}"></i> </div> ' +
-            '<div class="tile-object"> <div class="name">${name_} </div></div> ' +
+            '<div class="tile-object"> <div class="name">${name_}</div></div> ' +
             '</div>',
             folder: '<div class="tile bg-yellow" title="${title_}">' +
             '<div class="tile-body"> <i class="fa fa-folder-o"></i> </div> ' +
             '<div class="tile-object"> <div class="name">${name_} </div></div> ' +
             '</div>'
+        },
+        TableFile: {
+            file: '<tr><td><span class="fa ${icon_}"></span> ${name_}</td>'
+            + '<td class="text-right text-nowrap"><button class="btn btn-xs btn-info">${size_}</button> <button class="btn btn-xs btn-warning">下载</button></td></tr>',
+            folder: '<tr><td><span class="fa fa-folder-o"></span> ${name_}</td>'
+            + '<td class="text-right"><button class="btn btn-xs btn-warning">进入</button></td></tr>'
         },
         ContextMenu: {
             container: '<div></div>',
@@ -186,10 +198,14 @@
         render: function () {
             var that = this;
             //load return folder
-            this.$element = $.tmpl(FileManager.tpl.Folder.container);
+            var tplFolder = FileManager.tpl.Folder;
+            if (this.manager.options.viewType == "list") {
+                tplFolder = FileManager.tpl.TableFolder;
+            }
+            this.$element = $.tmpl(tplFolder.container);
             this.$element.css("height", that.manager.options.height);
             if (this.currentPath != "") {
-                this.$returnFolder = $.tmpl(FileManager.tpl.Folder.folder);
+                this.$returnFolder = $.tmpl(tplFolder.folder);
                 this.$element.append(this.$returnFolder);
             }
             this.files = [];
@@ -378,16 +394,22 @@
         },
         render: function () {
             var that = this;
+            var tplFile = FileManager.tpl.File;
+            if (this.folder.manager.options.viewType == 'list') {
+                tplFile = FileManager.tpl.TableFile;
+            }
             if (this.isDirectory) {
-                this.$element = $.tmpl(FileManager.tpl.File.folder, {
+                this.$element = $.tmpl(tplFile.folder, {
                     "name_": getShortName(this.data.name),
-                    "title_": this.data.name
+                    "title_": this.data.name,
+                    "size_": this.data.size
                 });
             } else {
                 var prefix = getPrefix(this.data.name);
-                this.$element = $.tmpl(FileManager.tpl.File.file, {
+                this.$element = $.tmpl(tplFile.file, {
                     "name_": getShortName(this.data.name),
                     "title_": this.data.name,
+                    "size_": this.data.size,
                     "icon_": File.icon[prefix] === undefined ? "fa-file-o" : File.icon[prefix]
                 });
             }
