@@ -917,7 +917,7 @@
                     var row = {};
                     $.each(that._grids, function (i, grid) {
                         var num = (that._pageNum - 1) * that._pageSize + i + 1;
-                        if (num % 3 == 1) {
+                        if ((i + 1) % 3 == 1) {
                             row = $('<div class="row"></div>');
                             cardRow.append(row);
                         }
