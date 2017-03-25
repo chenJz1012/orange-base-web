@@ -14,7 +14,7 @@
     }
 
     window.App = {
-        href: "http://admin.zt647.com",
+        href: "http://127.0.0.1",
         requestMapping: {}
     };
 

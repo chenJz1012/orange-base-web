@@ -1117,10 +1117,8 @@
             $('[role="tree"]').each(function () {
                 var tree = $(this);
                 var zTreeObj = $.fn.zTree.init(tree, tree.data("setting"));
-                console.log(zTreeObj);
                 var id = $(this).attr("did");
                 $("#tree_search_btn_" + id).on('click', function () {
-                    console.log(id);
                     var node = zTreeObj.getNodesByParamFuzzy("name", $("#tree_search_" + id).val());
                     zTreeObj.selectNode(node[0]);
                 });

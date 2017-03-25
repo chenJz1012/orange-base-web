@@ -20,13 +20,10 @@
             App.title(title);
             var content = $('<div class="panel-body" >' +
                 '<div class="row">' +
-                '<div class="col-md-6" id="index_grid"></div> ' +
-                '<div class="col-md-6">' +
-                '<div class="row">' +
-                '<div class="col-md-12" id="index_manager"></div>' +
-                '<div class="col-md-12" id="index_manager2"></div>' +
-                '</div>' +
+                '<div class="col-md-12" id="index_grid"></div> ' +
                 '</div> ' +
+                '<div class="row">' +
+                '<div class="col-md-12" id="index_from"></div> ' +
                 '</div>' +
                 '</div>');
             App.content.append(content);
@@ -195,22 +192,63 @@
                 }
             }]
         };
-        var form = App.content.find("#index_grid").orangeForm(formOpts);
-        var manager = App.content.find("#index_manager").fileManager();
-        var manager2 = App.content.find("#index_manager2").fileManager({
-            title: 'oss',
-            url: {
-                upload: App.href + "/api/ossFileManager/upload",
-                folder: App.href + "/api/ossFileManager/folder",
-                createFolder: App.href + "/api/ossFileManager/createFolder",
-                rename: App.href + "/api/ossFileManager/rename",
-                deleteFile: App.href + "/api/ossFileManager/deleteFile",
-                deleteFolder: App.href + "/api/ossFileManager/deleteFolder",
-                download: App.href + "/api/ossFileManager/download",
-                zip: App.href + "/api/ossFileManager/zip",
-                unCompress: App.href + "/api/ossFileManager/unCompress"
+        var form = App.content.find("#index_from").orangeForm(formOpts);
+
+        var gridOptions = {
+            url: App.href + "/api/sys/role/roleUserCount",
+            beforeSend: function (request) {
+                request.setRequestHeader("X-Auth-Token", App.token);
+            },
+            contentType: "chart",
+            pageNum: 1,//当前页码
+            pageSize: 15,//每页显示条数
+            idField: "id",//id域指定
+            headField: "roleName",
+            showCheck: true,//是否显示checkbox
+            checkboxWidth: "3%",
+            showIndexNum: true,
+            indexNumWidth: "5%",
+            pageSelect: [2, 15, 30, 50],
+            columns: [
+                {
+                    title: "角色名称",
+                    field: "roleName",
+                    chartX : true
+                }, {
+                    title: "用户数",
+                    field: "userCount",
+                    chartY : true
+                }
+            ],
+            search: {
+                rowEleNum: 2,
+                //搜索栏元素
+                items: [{
+                    type: "text",
+                    label: "角色名",
+                    name: "roleName",
+                    placeholder: "输入要搜索的角色名"
+                }]
             }
-        });
+        };
+        var grid = window.App.content.find("#index_grid").orangeGrid(gridOptions);
+        /*
+         var manager = App.content.find("#index_manager").fileManager();
+         var manager2 = App.content.find("#index_manager2").fileManager({
+         title: 'oss',
+         url: {
+         upload: App.href + "/api/ossFileManager/upload",
+         folder: App.href + "/api/ossFileManager/folder",
+         createFolder: App.href + "/api/ossFileManager/createFolder",
+         rename: App.href + "/api/ossFileManager/rename",
+         deleteFile: App.href + "/api/ossFileManager/deleteFile",
+         deleteFolder: App.href + "/api/ossFileManager/deleteFolder",
+         download: App.href + "/api/ossFileManager/download",
+         zip: App.href + "/api/ossFileManager/zip",
+         unCompress: App.href + "/api/ossFileManager/unCompress"
+         }
+         });
+         */
     };
 
 })(jQuery, window, document);

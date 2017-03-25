@@ -71,6 +71,30 @@
             timePickerSeconds: true
         };
     }
+    var geChartOption = function (xData, yData) {
+        return {
+            tooltip: {
+                trigger: 'item',
+                formatter: '{a}: {c}'
+            },
+            legend: {
+                left: 'left',
+                data: yData.legend
+            },
+            xAxis: {
+                type: 'category',
+                name: '',
+                data: xData
+            },
+            grid: {
+                containLabel: true
+            },
+            yAxis: {
+                name: ''
+            },
+            series: yData.data
+        };
+    };
     Grid.defaults = {
         autoLoad: true,
         pageNum: 1,
@@ -108,6 +132,7 @@
         tableRowTmpl: '<div role="content" class="table-scrollable"></div>',
         cardRowTmpl: '<div role="content" class="table-scrollable" style="margin-top: 10px;margin-bottom: 0px;"></div>',
         listRowTmpl: '<div role="content" class="table-scrollable" style="margin-top: 10px;margin-bottom: 0px;"></div>',
+        chartRowTmpl: '<div role="content" class="table-scrollable" style="margin-top: 10px;margin-bottom: 0px;"></div>',
         pagingRowTmpl: '<div class="row"><div role="select" class="col-md-2 col-sm-6"></div><div role="info" class="col-md-3 col-sm-6"></div><div role="goPage" class="col-md-2 col-sm-6" style="text-align: right;"></div><div role="page" class="col-md-5 col-sm-6"></div></div>',
         labelTmpl: '<label>${label_}</label>',
         textTmpl: '<input type="text" name="${name_}" id="${id_}" class="form-control ${span_}" placeholder="${placeholder_}" value="${value_}">',
@@ -783,29 +808,34 @@
                 '<a role="table" class="btn btn-large btn-info" title="表格" ><i class="fa fa-table"></i></a>' +
                 '<a role="card" class="btn btn-large btn-info" title="卡片"><i class="fa fa-th"></i></a>' +
                 '<a role="list" class="btn btn-large btn-info" title="列表"><i class="fa fa-list"></i></a>' +
+                '<a role="chart" class="btn btn-large btn-info" title="图表"><i class="fa fa-bar-chart-o"></i></a>' +
                 '</div>' +
                 '</div></div>');
             if (this._showContentType) {
                 gridWrapper.append(contentTypeBtn);
             }
             this.$contentTypeBtn = contentTypeBtn;
-            if (this._contentType === "table") {
-                this.$contentTypeBtn.find("a[role=table]").addClass("active");
-                this.$contentTypeBtn.find("a[role=card]").removeClass("active");
-                this.$contentTypeBtn.find("a[role=list]").removeClass("active");
-                this._renderTable();
-            } else if (this._contentType === "card") {
-                this.$contentTypeBtn.find("a[role=table]").removeClass("active");
-                this.$contentTypeBtn.find("a[role=card]").addClass("active");
-                this.$contentTypeBtn.find("a[role=list]").removeClass("active");
-                this._renderCard();
-            } else if (this._contentType === "list") {
-                this.$contentTypeBtn.find("a[role=table]").removeClass("active");
-                this.$contentTypeBtn.find("a[role=card]").removeClass("active");
-                this.$contentTypeBtn.find("a[role=list]").addClass("active");
-                this._renderList();
+            this.$contentTypeBtn.find("a[role=" + this._contentType + "]").addClass("active");
+            this.$contentTypeBtn.find("a[role!=" + this._contentType + "]").removeClass("active");
+            var showPage = this._showPaging;
+            switch (this._contentType) {
+                case "table":
+                    this._renderTable();
+                    break;
+                case "card":
+                    this._renderCard();
+                    break;
+                case "list":
+                    this._renderList();
+                    break;
+                case "chart":
+                    this._renderChart();
+                    showPage = false;
+                    break;
+                default:
+                    this._renderCard();
             }
-            if (this._showPaging) {
+            if (showPage) {
                 this._renderPaging();
             }
             this.$contentTypeBtn.find("a").off("click");
@@ -815,6 +845,58 @@
                     contentType: role
                 });
             });
+        },
+        _renderChart: function () {
+            var that = this;
+            var chartRow = $.tmpl(Grid.statics.chartRowTmpl, {});
+            var div = $('<div id="chartDiv" style="height:400px;"></div>');
+            chartRow.append(div);
+            this.$gridWrapper.append(chartRow);
+            var yData = {};
+            var xData = [];
+            yData['legend'] = [];
+            yData['data'] = [];
+            var dataMap = {};
+            var titleMap = {};
+            if (that._grids != undefined && that._grids != null) {
+                if (that._grids.length > 0) {
+                    $.each(that._grids, function (i, grid) {
+                        var num = (that._pageNum - 1) * that._pageSize + i + 1;
+                        $.each(that._columns, function (j, column) {
+                            var field = column.field;
+                            var data = grid[field];
+                            var title = column.title;
+                            if (column.format != undefined) {
+                                data = column.format(num, grid);
+                            }
+                            if (column.chartX) {
+                                xData.push(data);
+                            }
+                            if (column.chartY) {
+                                yData['legend'].push(title);
+                                if (dataMap[field] == undefined) {
+                                    dataMap[field] = [];
+                                }
+                                dataMap[field].push(data);
+                                if (titleMap[field] == undefined) {
+                                    titleMap[field] = title;
+                                }
+                            }
+                        });
+                    });
+                }
+            }
+            $.each(dataMap, function (k, v) {
+                var d = {
+                    name: titleMap[k],
+                    type: "bar",
+                    data: v
+                };
+                yData['data'].push(d);
+            });
+            var chartOption = geChartOption(xData, yData);
+            var chart = echarts.init(document.getElementById('chartDiv'));
+            chart.setOption(chartOption);
         },
         _renderList: function () {
             var that = this;
