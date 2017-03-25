@@ -850,7 +850,7 @@
             chartType = chartType == undefined ? 'bar' : chartType;
             var that = this;
             var chartRow = $.tmpl(Grid.statics.chartRowTmpl, {});
-            var div = $('<div id="chartDiv" style="height:400px;"></div>');
+            var div = $('<div class="col-xs-12" id="' + that._elementId + '_chartDiv" style="height:400px;"></div>');
             chartRow.append(div);
             this.$gridWrapper.append(chartRow);
             var yData = {};
@@ -896,7 +896,7 @@
                 yData['data'].push(d);
             });
             var chartOption = geChartOption(xData, yData);
-            var chart = echarts.init(document.getElementById('chartDiv'));
+            var chart = echarts.init(document.getElementById(that._elementId + '_chartDiv'));
             chart.setOption(chartOption);
         },
         _renderList: function () {
