@@ -37,6 +37,7 @@
                 request.setRequestHeader("X-Auth-Token", App.token);
             },
             contentType: "chart",
+            chartType: "bar",
             pageNum: 1,//当前页码
             pageSize: 15,//每页显示条数
             idField: "id",//id域指定
@@ -50,11 +51,15 @@
                 {
                     title: "角色名称",
                     field: "roleName",
-                    chartX : true
+                    chartX: true
                 }, {
                     title: "用户数",
                     field: "userCount",
-                    chartY : true
+                    chartY: true
+                }, {
+                    title: "菜单数",
+                    field: "functionCount",
+                    chartY: true
                 }
             ],
             search: {

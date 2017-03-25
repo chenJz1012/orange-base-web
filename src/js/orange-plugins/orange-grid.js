@@ -829,7 +829,7 @@
                     this._renderList();
                     break;
                 case "chart":
-                    this._renderChart();
+                    this._renderChart(that._options.chartType);
                     showPage = false;
                     break;
                 default:
@@ -846,7 +846,8 @@
                 });
             });
         },
-        _renderChart: function () {
+        _renderChart: function (chartType) {
+            chartType = chartType == undefined ? 'bar' : chartType;
             var that = this;
             var chartRow = $.tmpl(Grid.statics.chartRowTmpl, {});
             var div = $('<div id="chartDiv" style="height:400px;"></div>');
@@ -889,7 +890,7 @@
             $.each(dataMap, function (k, v) {
                 var d = {
                     name: titleMap[k],
-                    type: "bar",
+                    type: chartType,
                     data: v
                 };
                 yData['data'].push(d);
@@ -1007,7 +1008,7 @@
                     var row = {};
                     $.each(that._grids, function (i, grid) {
                         var num = (that._pageNum - 1) * that._pageSize + i + 1;
-                        if ((i+1) % 3 == 1) {
+                        if ((i + 1) % 3 == 1) {
                             row = $('<div class="row"></div>');
                             cardRow.append(row);
                         }
