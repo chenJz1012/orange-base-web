@@ -387,6 +387,20 @@
                 }
             }
 
+            if (item.change !== undefined) {
+                ele.parent().find('[drole=main]').on('change', function () {
+                    var value = $(this).val();
+                    item.change(that, value);
+                });
+
+                if (ele.parent().find('[drole=main]').is("input[type=text]") || ele.parent().find('[drole=main]').is("textarea")) {
+                    ele.parent().find('[drole=main]').on("keypress keyup", function () {
+                        var value = $(this).val();
+                        item.change(that, value);
+                    });
+                }
+            }
+
             // 记录元素数据
             wrapper.data("data", item);
             this._module[item.name] = wrapper;
@@ -446,25 +460,30 @@
                     "attribute_": (data.attribute === undefined ? ""
                         : data.attribute)
                 });
-                ele.append(data.html);
+                if (data.eleHandle != undefined) {
+                    var p = data.eleHandle(data.handleParams);
+                    ele.append(p);
+                } else {
+                    ele.append(data.html);
+                }
                 if (data.loadHandle !== undefined) {
                     ele.data("load", data.loadHandle);
                 }
                 return ele;
             },
             'display': function (data, form) {
-                var textTmpl = '<p id="${id_}" name="${name_}" ${attribute_} class="form-control-static"></p>';
+                var textTmpl = '<p drole="main" style="${style_}" id="${id_}" name="${name_}" ${attribute_} class="form-control-static"></p>';
                 var ele = $.tmpl(textTmpl, {
                     "id_": (data.id === undefined ? data.name : data.id),
                     "name_": data.name,
-                    "attribute_": (data.attribute === undefined ? ""
-                        : data.attribute)
+                    "style_": (data.style === undefined ? ""
+                        : data.style)
                 });
                 ele.data("format", data.format);
                 return ele;
             },
             'hidden': function (data, form) {
-                var textTmpl = '<input type="hidden" id="${id_}" name="${name_}" class="form-control" ${attribute_}>';
+                var textTmpl = '<input drole="main" type="hidden" id="${id_}" name="${name_}" class="form-control" ${attribute_}>';
                 var ele = $.tmpl(textTmpl, {
                     "id_": (data.id === undefined ? data.name : data.id),
                     "name_": data.name,
@@ -474,7 +493,7 @@
                 return ele;
             },
             'text': function (data, form) {
-                var textTmpl = '<input type="text" showicon=${showIcon_} id="${id_}" name="${name_}" class="form-control ${cls_}" ${readonly_} ${disabled_} ${attribute_} placeholder="${placeholder_}">';
+                var textTmpl = '<input drole="main" type="text" showicon=${showIcon_} id="${id_}" name="${name_}" class="form-control ${cls_}" ${readonly_} ${disabled_} ${attribute_} placeholder="${placeholder_}">';
                 var ele = $.tmpl(textTmpl, {
                     "id_": (data.id === undefined ? data.name : data.id),
                     "name_": data.name,
@@ -492,7 +511,7 @@
                 return ele;
             },
             'password': function (data, form) {
-                var passwordTmpl = '<input type="password" id="${id_}" name="${name_}" class="form-control ${cls_}" ${readonly_} ${disabled_} ${attribute_} placeholder="${placeholder_}">';
+                var passwordTmpl = '<input drole="main" type="password" id="${id_}" name="${name_}" class="form-control ${cls_}" ${readonly_} ${disabled_} ${attribute_} placeholder="${placeholder_}">';
                 var ele = $.tmpl(passwordTmpl, {
                     "id_": (data.id === undefined ? data.name : data.id),
                     "name_": data.name,
@@ -508,7 +527,7 @@
                 return ele;
             },
             'textarea': function (data, form) {
-                var textareaTmpl = '<textarea id="${id_}" name="${name_}" class="form-control ${cls_}" ${readonly_} ${disabled_} ${attribute_} rows="${rows_}"></textarea>';
+                var textareaTmpl = '<textarea drole="main" id="${id_}" name="${name_}" class="form-control ${cls_}" ${readonly_} ${disabled_} ${attribute_} rows="${rows_}"></textarea>';
                 var ele = $.tmpl(textareaTmpl, {
                     "id_": (data.id === undefined ? data.name : data.id),
                     "name_": data.name,
@@ -522,7 +541,7 @@
                 return ele;
             },
             'select': function (data, form) {
-                var selectTmpl = '<select id="${id_}" name="${name_}" ${attribute_} ${disabled_} class="form-control ${cls_}"></select>';
+                var selectTmpl = '<select drole="main" id="${id_}" name="${name_}" ${attribute_} ${disabled_} class="form-control ${cls_}"></select>';
                 var optionTmpl = '<option value=${value_} ${selected}>${text_}</option>';
                 var ele = $.tmpl(selectTmpl, {
                     "id_": (data.id === undefined ? data.name : data.id),
@@ -566,7 +585,7 @@
             'checkboxGroup': function (data, form) {
                 var inlineCls = "checkbox-inline";
                 var wrapperTmpl = '<div id="${id_}_cbg" name="${name_}_cbg" ${attribute_} class="checkbox-list"></div>';
-                var checkboxTmpl = '<label class="${inline_}"><input name="${name_}" value="${value_}" type="checkbox" ${checked_} ${attribute_} ${disabled_} >${text_}</label>';
+                var checkboxTmpl = '<label class="${inline_}"><input drole="main" name="${name_}" value="${value_}" type="checkbox" ${checked_} ${attribute_} ${disabled_} >${text_}</label>';
                 var ele = $.tmpl(wrapperTmpl, {
                     "id_": (data.id === undefined ? data.name : data.id),
                     "name_": data.name,
@@ -638,7 +657,7 @@
             'radioGroup': function (data, form) {
                 var inlineCls = "radio-inline";
                 var wrapperTmpl = '<div class="radio-list"></div>';
-                var radioTmpl = '<label class="radio ${inline_}"><input name="${name_}" value="${value_}" type="radio" ${checked_} ${attribute_}>${text_}</label>';
+                var radioTmpl = '<label class="radio ${inline_}"><input drole="main" name="${name_}" value="${value_}" type="radio" ${checked_} ${attribute_}>${text_}</label>';
                 var ele = $.tmpl(wrapperTmpl, {
                     "id_": (data.id === undefined ? data.name : data.id),
                     "name_": data.name,
@@ -656,6 +675,9 @@
                             "attribute_": (radio.attribute === undefined ? ""
                                 : radio.attribute)
                         });
+                        if (!data.inline) {
+                            rd.css("margin-left", "20px");
+                        }
                         ele.append(rd);
                     });
                 }
@@ -696,7 +718,7 @@
             },
             'datepicker': function (data, form) {
                 var dateTmpl = '<div class="input-group input-medium">'
-                    + '<input type="text" role="date-input" id="${id_}" name=${name_} value="${value_}" class="form-control">'
+                    + '<input drole="main" type="text" role="date-input" id="${id_}" name=${name_} value="${value_}" class="form-control">'
                     + '<span role="icon" class="input-group-addon">'
                     + '<i class="glyphicon glyphicon-calendar fa fa-calendar"></i>' + '</span></div>';
                 if (typeof(moment) == "undefined") {
@@ -734,7 +756,7 @@
                     + '<span class="input-group-addon btn btn-default btn-file">'
                     + '<span class="fileinput-new">选择文件 </span>'
                     + '<span class="fileinput-exists">变更 </span>'
-                    + '<input type="text" role="file-input" id="${id_}" name="${name_}" value="" style="display:none;"><input type="file" role="file" id="file_${id_}" name="file"/>'
+                    + '<input drole="main" type="text" role="file-input" id="${id_}" name="${name_}" value="" style="display:none;"><input type="file" role="file" id="file_${id_}" name="file"/>'
                     + '</span>'
                     + '<a href="javascript:;" class="input-group-addon btn btn-danger fileinput-exists" data-dismiss="fileinput">删除 </a>'
                     + '</div></div></div>';
@@ -743,13 +765,13 @@
                     "name_": data.name
                 });
                 if (data.uploadUrl === undefined) {
-                    data.uploadUrl = App.href + "/api/common/uploadFile" + "?orange_token=" + App.token
+                    data.uploadUrl = App.href + "/api/common/uploadFile" + "?orange_base_token=" + App.token
                 } else {
-                    if (data.uploadUrl.indexOf("orange_token=") == -1) {
+                    if (data.uploadUrl.indexOf("orange_base_token=") == -1) {
                         if (data.uploadUrl.indexOf("?") != -1) {
-                            data.uploadUrl += ("&orange_token=" + App.token);
+                            data.uploadUrl += ("&orange_base_token=" + App.token);
                         } else {
-                            data.uploadUrl += ("?orange_token=" + App.token);
+                            data.uploadUrl += ("?orange_base_token=" + App.token);
                         }
                     }
                 }
@@ -850,7 +872,7 @@
                     + '<span class="btn btn-default btn-file">'
                     + '<span class="fileinput-new">选择图片 </span>'
                     + '<span class="fileinput-exists">更改</span>'
-                    + '<input type="text" role="image-input" id="${id_}" name="${name_}" style="display:none;"><input role="file" type="file" id="image_${id_}" name="file"/>'
+                    + '<input drole="main" type="text" role="image-input" id="${id_}" name="${name_}" style="display:none;"><input role="file" type="file" id="image_${id_}" name="file"/>'
                     + '</span>'
                     + '<a href="javascript:;" class="btn btn-danger fileinput-exists" data-dismiss="fileinput">删除</a>'
                     + '</div></div></div>';
@@ -859,13 +881,13 @@
                     "name_": data.name
                 });
                 if (data.uploadUrl === undefined) {
-                    data.uploadUrl = App.href + "/api/common/uploadImage" + "?orange_token=" + App.token
+                    data.uploadUrl = App.href + "/api/common/uploadImage" + "?orange_base_token=" + App.token
                 } else {
-                    if (data.uploadUrl.indexOf("orange_token=") == -1) {
+                    if (data.uploadUrl.indexOf("orange_base_token=") == -1) {
                         if (data.uploadUrl.indexOf("?") != -1) {
-                            data.uploadUrl += ("&orange_token=" + App.token);
+                            data.uploadUrl += ("&orange_base_token=" + App.token);
                         } else {
-                            data.uploadUrl += ("?orange_token=" + App.token);
+                            data.uploadUrl += ("?orange_base_token=" + App.token);
                         }
                     }
                 }
@@ -974,15 +996,24 @@
                 return ele;
             },
             'tree': function (data, form) {
-                var treeTmp = '<input role="tree_${id_}_input" data-type="tree-input" type="text" id="${id_}" name="${name_}" value="" class="hide"/>'
-                    + '<ul id="tree_${id_}" role="tree" class="ztree"></ul>';
+                var treeTmp =
+                    '<div class="form-group input-group ${hideSearch_}" style="width: 33%;">'
+                    + '<input type="text" id="tree_search_${id_}" class="form-control">'
+                    + '<span class="input-group-btn">'
+                    + '<button class="btn btn-default" id="tree_search_btn_${id_}" type="button"><i class="fa fa-search"></i>'
+                    + '</button>'
+                    + '</span>'
+                    + '</div>'
+                    + '<input drole="main" role="tree_${id_}_input" data-type="tree-input" type="text" id="${id_}" name="${name_}" value="" class="hide"/>'
+                    + '<ul id="tree_${id_}" role="tree" did="${id_}" class="ztree"></ul>';
                 var ele = $.tmpl(treeTmp, {
                     "id_": (data.id === undefined ? data.name : data.id),
-                    "name_": data.name
+                    "name_": data.name,
+                    "hideSearch_": data.hideSearch != undefined && !data.hideSearch ? '' : 'hide'
                 });
                 var chkboxType = data.chkboxType === undefined ? {"Y": "p", "N": "p"} : data.chkboxType;
                 var beforeCheck = data.beforeCheck === undefined ? function () {
-                } : data.beforeCheck;
+                    } : data.beforeCheck;
                 var setting = {
                     check: {
                         enable: (data.checkable === undefined ? true : data.checkable),
@@ -1018,6 +1049,7 @@
                                 $("[role='" + treeId + "_input']").val("")
                                     .attr("value", "");
                             }
+                            $("[role='" + treeId + "_input']").trigger("change");
                         },
                         onAsyncSuccess: function (event, treeId, treeNode, msg) {
                             var zTree = $.fn.zTree.getZTreeObj(treeId);
@@ -1046,7 +1078,7 @@
                 return ele;
             },
             'kindEditor': function (data, form) {
-                var kindeditorTmpl = '<textarea role="kindEditor" class="form-control" id="${id_}" name="${name_}"></textarea>';
+                var kindeditorTmpl = '<textarea drole="main" role="kindEditor" class="form-control" id="${id_}" name="${name_}"></textarea>';
                 var ele = $.tmpl(kindeditorTmpl, {
                     "id_": (data.id === undefined ? data.name : data.id),
                     "name_": data.name
@@ -1084,8 +1116,16 @@
             }
             $('[role="tree"]').each(function () {
                 var tree = $(this);
-                $.fn.zTree.init(tree, tree.data("setting"));
+                var zTreeObj = $.fn.zTree.init(tree, tree.data("setting"));
+                console.log(zTreeObj);
+                var id = $(this).attr("did");
+                $("#tree_search_btn_" + id).on('click', function () {
+                    console.log(id);
+                    var node = zTreeObj.getNodesByParamFuzzy("name", $("#tree_search_" + id).val());
+                    zTreeObj.selectNode(node[0]);
+                });
             });
+
         },
         _initKindEditor: function () {
             var that = this;
@@ -1100,9 +1140,9 @@
                                 .create('#' + ele.attr("id"),
                                     {
                                         uploadJson: App.href
-                                        + '/api/KE/fileUpload?orange_token=' + App.token,
+                                        + '/api/KE/fileUpload?orange_base_token=' + App.token,
                                         fileManagerJson: App.href
-                                        + '/api/KE/fileManager?orange_token=' + App.token,
+                                        + '/api/KE/fileManager?orange_base_token=' + App.token,
                                         minWidth: 0,
                                         width: edWith,
                                         height: (ele
@@ -1138,7 +1178,7 @@
                 + '<input type="hidden" name="${attName_}" class="att"/>'
                 + '</tr>';
             var deleteStr = '<span >删除</span>';
-            var uploadUrl = App.href + '/api/common/uploadFiles?orange_token=' + App.token;
+            var uploadUrl = App.href + '/api/common/uploadFiles?orange_base_token=' + App.token;
             var files = $("input[role=fileuploadInput]");
             if (files.length > 0) {
                 $.each(files, function (i, file) {
@@ -1146,11 +1186,11 @@
                     var currentData = {};
                     if (element_data.uploadUrl !== undefined)
                         uploadUrl = element_data.uploadUrl;
-                    if (uploadUrl.indexOf("orange_token") == -1) {
+                    if (uploadUrl.indexOf("orange_base_token") == -1) {
                         if (uploadUrl.indexOf("?") != -1) {
-                            uploadUrl += ("&orange_token=" + App.token);
+                            uploadUrl += ("&orange_base_token=" + App.token);
                         } else {
-                            uploadUrl += ("?orange_token=" + App.token);
+                            uploadUrl += ("?orange_base_token=" + App.token);
                         }
                     }
                     $('#fileupload_' + element_data.id).fileupload(
@@ -1213,7 +1253,6 @@
                             },
                             done: function (e, data) {// 设置文件上传完毕事件的回调函数
                                 $(".start", data.content).remove();
-                                console.info(data.result);
                                 var id = data.result.attachmentId;
                                 var name = data.result.attachmentName;
                                 var url = data.result.attachmentUrl;
@@ -1257,11 +1296,11 @@
                 return;
             var ids = fileIds.toString().split(",");
             var fileInfoUrl = (elementData.fileInfoUrl === undefined ? (App.href + "/api/common/attachment") : elementData.fileInfoUrl);
-            if (fileInfoUrl.indexOf("orange_token=") == -1) {
+            if (fileInfoUrl.indexOf("orange_base_token=") == -1) {
                 if (fileInfoUrl.indexOf("?") != -1) {
-                    fileInfoUrl += ("&orange_token=" + App.token);
+                    fileInfoUrl += ("&orange_base_token=" + App.token);
                 } else {
-                    fileInfoUrl += ("?orange_token=" + App.token);
+                    fileInfoUrl += ("?orange_base_token=" + App.token);
                 }
             }
             var dataParam = (elementData.dataParam === undefined ? "attachmentId" : elementData.dataParam);
@@ -1385,7 +1424,8 @@
                     data: $('#' + that._formId).serialize(),
                     beforeSend: function (request) {
                         request.setRequestHeader("X-Auth-Token", App.token);
-                        that._beforeSend(request);
+                        if (that._beforeSend != undefined)
+                            that._beforeSend(request);
                     },
                     dataType: "json",
                     success: function (data) {
@@ -1537,7 +1577,7 @@
                 var format = ele.data("format");
                 if (format !== undefined)
                     value = format(value);
-                ele.text(value);
+                ele.html(value);
             } else if (ele.is('table')) {
                 this._renderMultipleFiles(ele, name, value);
             } else {
@@ -1553,7 +1593,7 @@
             var that = this;
             if (this._data !== undefined) {
                 $.each(this._data, function (i, value) {
-                    that._loadValue(i, value);
+                    that._alue(i, value);
                 });
             } else {
                 if (this.$form !== undefined)

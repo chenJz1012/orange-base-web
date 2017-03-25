@@ -155,7 +155,7 @@
         alert: function (alertText) {
             this._alert(alertText, "danger", 5);
         },
-        _alert: function (alertText, type, seconds) {
+        _alert: function (alertText, type, seconds, cb) {
             if (type == undefined) {
                 type = "danger";
             }
@@ -169,6 +169,9 @@
             this.$element.prepend(alertDiv);
             alertDiv.delay(seconds * 1000).fadeOut();
             App.scrollTo(alertDiv, -200);
+            if (cb != undefined) {
+                cb();
+            }
         },
         // 设置变量
         _setVariable: function (element, options) {
@@ -296,6 +299,8 @@
                     if (data.code === 200) {
                         that._setData(data.data);
                         that._init();
+                    } else if (data.code === 401) {
+                        that._alert(data.message + ";请重新登录！", App.redirectLogin);
                     } else {
                         that._alert(data.message);
                     }
@@ -419,7 +424,7 @@
                         function (index, item) {
                             var itemDiv = $.tmpl(
                                 Grid.statics.searchElementTmpl, {
-                                    "span_": rowEleSpan
+                                    "span_": (item.rowNum > 0 ? item.rowNum * rowEleSpan : rowEleSpan)
                                 }).appendTo(searchFormRow);
                             if (item.label != undefined) {
                                 var label = $.tmpl(
@@ -664,6 +669,9 @@
                                 ele.find('span').on("click", function () {
                                     $(this).prev().click();
                                 });
+                            } else if (item.type == "html") {
+                                var ele = item.eleHandle();
+                                itemDiv.find(".form-group").append(ele);
                             }
                             searchFormRow.find(".row").append(itemDiv);
                         });
@@ -829,7 +837,7 @@
                 var num = (that._pageNum - 1) * that._pageSize + i + 1;
                 var ele = $('<dl>' +
                     '<dt>' +
-                    '<img role="img" src="../../themes/sb-admin/img/128.png" alt="Product image" width="128" height="128" />' +
+                    '<img role="img" src="../../cdn/img/128.png" alt="Product image" width="128" height="128" />' +
                     '<strong><span role="cb"></span></strong>' +
                     '<a href="javacript:void(0);" role="hd"></a>' +
                     '</dt>' +
