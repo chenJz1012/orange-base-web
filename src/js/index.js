@@ -37,6 +37,7 @@
                 request.setRequestHeader("X-Auth-Token", App.token);
             },
             contentType: "chart",
+            showContentType: false,
             chartType: "bar",
             pageNum: 1,//当前页码
             pageSize: 15,//每页显示条数
@@ -61,17 +62,7 @@
                     field: "functionCount",
                     chartY: true
                 }
-            ],
-            search: {
-                rowEleNum: 2,
-                //搜索栏元素
-                items: [{
-                    type: "text",
-                    label: "角色名",
-                    name: "roleName",
-                    placeholder: "输入要搜索的角色名"
-                }]
-            }
+            ]
         };
         var grid = window.App.content.find("#index_grid").orangeGrid(gridOptions);
     };
