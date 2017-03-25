@@ -1007,12 +1007,12 @@
                     var row = {};
                     $.each(that._grids, function (i, grid) {
                         var num = (that._pageNum - 1) * that._pageSize + i + 1;
-                        if ((i + 1) % 3 == 1) {
+                        if ((i+1) % 3 == 1) {
                             row = $('<div class="row"></div>');
                             cardRow.append(row);
                         }
                         var ele = $('<div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">' +
-                            '<div class="thumbnail">' +
+                            '<div class="thumbnail col-lg-12">' +
                             '<div class="caption">' +
                             '<div class="col-lg-12">' +
                             '<span class="puu-left">' + num + '</span>' +
