@@ -26,7 +26,7 @@
         headerTmpl: '<div id="${id_}head" class="modal-header" style="background-color: ${color_};"></div>',
         closeBtnTmpl: '<button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>',
         titleTmpl: '<h5 id="${id_}title" class="modal-title" >${title_}</h5>',
-        bodyTmpl: '<div  id="${id_}body" class="modal-body"><div class="panel-body"></div></div>',
+        bodyTmpl: '<div id="${id_}body" class="modal-body"><div id="${id_}_panel" class="panel-body"></div></div>',
         footerTmpl: '<div id="${id_}footer" class="modal-footer"></div>',
         buttonTmpl: '<button type="button" ${attrbute_} class="btn ${cls_}">${text_}</button>'
     };
@@ -123,8 +123,7 @@
             });
             modal.append(body);
             this.$body = body.find("div.panel-body");
-
-            // footer
+            this.$body.css("height",that.modalOpts.minHeight);
             if (this._buttons !== undefined) {
                 var footer = $.tmpl(Modal.statics.footerTmpl, {
                     "id_": that._elementId
@@ -144,7 +143,7 @@
                     });
                     if (button.handle !== undefined) {
                         btn.on("click", function () {
-                            button.handle();
+                            button.handle(that);
                         });
                     }
                     footer.append(btn);

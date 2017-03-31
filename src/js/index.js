@@ -36,9 +36,9 @@
             beforeSend: function (request) {
                 request.setRequestHeader("X-Auth-Token", App.token);
             },
-            contentType: "chart",
-            showContentType: false,
-            chartType: "bar",
+            contentType: "chart-bar",
+            showContentType: true,
+            contentTypeItems: "table,list,chart-bar",
             pageNum: 1,//当前页码
             pageSize: 15,//每页显示条数
             idField: "id",//id域指定

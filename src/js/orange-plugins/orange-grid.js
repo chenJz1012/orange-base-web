@@ -71,28 +71,53 @@
             timePickerSeconds: true
         };
     }
-    var geChartOption = function (xData, yData) {
+    var getNormalChartOption = function (xData, yData) {
         return {
-            tooltip: {
-                trigger: 'item',
-                formatter: '{a}: {c}'
-            },
             legend: {
-                left: 'left',
-                data: yData.legend
+                x: 'center',
+                y: 'bottom',
+                data: xData['legend']
             },
-            xAxis: {
-                type: 'category',
-                name: '',
-                data: xData
+            tooltip: {
+                trigger: 'axis',
+                formatter: '{b} <br/> {a}: {c}',
+                axisPointer: {
+                    type: 'cross',
+                    animation: false,
+                    label: {
+                        borderWidth: 1,
+                        shadowBlur: 0,
+                        shadowOffsetX: 0,
+                        shadowOffsetY: 0
+                    }
+                }
             },
             grid: {
                 containLabel: true
             },
-            yAxis: {
-                name: ''
+            xAxis: {
+                type: 'category',
+                data: xData['data']
             },
-            series: yData.data
+            yAxis: {
+                type: 'value'
+            },
+            series: yData
+        };
+    };
+    var getPieChartOption = function (xData, yData) {
+        return {
+            legend: {
+                x: 'center',
+                y: 'bottom',
+                selectedMode: 'single',
+                data: xData['legend']
+            },
+            tooltip: {
+                trigger: 'item',
+                formatter: "{b} <br/> {a} : {c} ({d}%)"
+            },
+            series: yData
         };
     };
     Grid.defaults = {
@@ -108,7 +133,7 @@
         showContentType: true,
         showSearch: true,
         showPaging: true,
-        simplePaging: false,
+        simplePaging: true,
         actionColumnText: "操作",
         actionColumnAlign: "left",
         actionColumnWidth: "20%",
@@ -260,6 +285,8 @@
             this._showSearch = options.showSearch;
             this._showPaging = options.showPaging;
             this._simplePaging = options.simplePaging;
+            this._chartClick = options.chartClick;
+            this._showLegend = options.showLegend;
             if (options.tools != undefined) {
                 // 左侧工具栏
                 this._tools = options.tools;
@@ -313,7 +340,7 @@
                 type: that._type,
                 dataType: "json",
                 data: that.$searchForm == undefined ? {} : that.$searchForm
-                        .serialize(),
+                    .serialize(),
                 beforeSend: function (request) {
                     if (that._beforeSend != undefined) {
                         that._beforeSend(request);
@@ -784,14 +811,15 @@
                 that._reload({
                     pageNum: 1
                 });
-                if (that._search.submitHandle != undefined)
-                    that._search.submitHandle();
             });
             searchFormRow.find('.form-actions').append(searchbtn);
             searchbtn.after("&nbsp;");
             this.$element.append(searchFormRow);
             this._uniform();
             this.$searchForm = searchFormRow.find("form[ele-type='search']");
+            this.$searchForm.find("input,select").on("change", function () {
+                searchbtn.trigger("click");
+            });
             if (hide) {
                 searchFormRow.find('.form-body').slideUp(1);
             }
@@ -803,39 +831,48 @@
             });
             this.$element.append(gridWrapper);
             this.$gridWrapper = gridWrapper;
-            var contentTypeBtn = $('<div class="row"><div class="col-lg-12">' +
+            var contentTypeBtn = $('<div class="row">' +
+                '<div class="col-lg-12">' +
                 '<div id="tab" class="btn-group pull-right">' +
                 '<a role="table" class="btn btn-large btn-info" title="表格" ><i class="fa fa-table"></i></a>' +
                 '<a role="card" class="btn btn-large btn-info" title="卡片"><i class="fa fa-th"></i></a>' +
                 '<a role="list" class="btn btn-large btn-info" title="列表"><i class="fa fa-list"></i></a>' +
-                '<a role="chart" class="btn btn-large btn-info" title="图表"><i class="fa fa-bar-chart-o"></i></a>' +
+                '<a role="chart-bar" class="btn btn-large btn-info" title="柱状图"><i class="fa fa-bar-chart-o"></i></a>' +
+                '<a role="chart-line" class="btn btn-large btn-info" title="折线图"><i class="fa fa-line-chart"></i></a>' +
+                '<a role="chart-pie" class="btn btn-large btn-info" title="饼图"><i class="fa fa-pie-chart"></i></a>' +
                 '</div>' +
                 '</div></div>');
             if (this._showContentType) {
+                if (this._options.contentTypeItems != undefined) {
+                    contentTypeBtn.find("a").each(function (i) {
+                        if (that._options.contentTypeItems.indexOf($(this).attr("role")) == -1) {
+                            $(this).remove();
+                        }
+                    });
+                }
                 gridWrapper.append(contentTypeBtn);
             }
             this.$contentTypeBtn = contentTypeBtn;
             this.$contentTypeBtn.find("a[role=" + this._contentType + "]").addClass("active");
             this.$contentTypeBtn.find("a[role!=" + this._contentType + "]").removeClass("active");
-            var showPage = this._showPaging;
-            switch (this._contentType) {
-                case "table":
-                    this._renderTable();
-                    break;
-                case "card":
-                    this._renderCard();
-                    break;
-                case "list":
-                    this._renderList();
-                    break;
-                case "chart":
-                    this._renderChart(that._options.chartType);
-                    showPage = false;
-                    break;
-                default:
-                    this._renderCard();
+            if (/chart-([a-z]+)/.test(this._contentType)) {
+                this._renderChart(that._contentType.match('chart-([a-z]+)')[1]);
+            } else {
+                switch (this._contentType) {
+                    case "table":
+                        this._renderTable();
+                        break;
+                    case "card":
+                        this._renderCard();
+                        break;
+                    case "list":
+                        this._renderList();
+                        break;
+                    default:
+                        this._renderCard();
+                }
             }
-            if (showPage) {
+            if (this._showPaging) {
                 this._renderPaging();
             }
             this.$contentTypeBtn.find("a").off("click");
@@ -853,11 +890,7 @@
             var div = $('<div class="col-xs-12" id="' + that._elementId + '_chartDiv" style="height:400px;"></div>');
             chartRow.append(div);
             this.$gridWrapper.append(chartRow);
-            var yData = {};
-            var xData = [];
-            yData['legend'] = [];
-            yData['data'] = [];
-            var dataMap = {};
+            var fullData = {};
             var titleMap = {};
             if (that._grids != undefined && that._grids != null) {
                 if (that._grids.length > 0) {
@@ -871,33 +904,91 @@
                                 data = column.format(num, grid);
                             }
                             if (column.chartX) {
-                                xData.push(data);
+                                if (fullData['x'] == undefined) {
+                                    fullData['x'] = {};
+                                }
+                                fullData['x'][num] = data;
                             }
                             if (column.chartY) {
-                                yData['legend'].push(title);
-                                if (dataMap[field] == undefined) {
-                                    dataMap[field] = [];
+                                if (fullData['y'] == undefined) {
+                                    fullData['y'] = {};
                                 }
-                                dataMap[field].push(data);
+                                if (fullData['y'][field] == undefined) {
+                                    fullData['y'][field] = {};
+                                }
+                                if (fullData['y'][field][num] == undefined) {
+                                    fullData['y'][field][num] = [];
+                                }
+                                fullData['y'][field][num].push(data);
                                 if (titleMap[field] == undefined) {
                                     titleMap[field] = title;
                                 }
                             }
                         });
                     });
+                    var chartOption = {};
+                    var xData = {};
+                    var yData = [];
+                    switch (chartType) {
+                        case 'pie':
+                            xData['data'] = [];
+                            xData['legend'] = [];
+                            $.each(fullData['x'], function (f, d) {
+                                xData['data'].push(d);
+                            });
+                            $.each(fullData['y'], function (f, d) {
+                                xData['legend'].push(titleMap[f]);
+                                var dArr = [];
+                                $.each(fullData['y'][f], function (sk, sv) {
+                                    var name = fullData['x'][sk];
+                                    dArr.push({
+                                        'name': name,
+                                        'value': sv[0]
+                                    })
+                                });
+                                var s = {
+                                    name: titleMap[f],
+                                    type: chartType,
+                                    data: dArr
+                                };
+                                yData.push(s);
+                            });
+                            chartOption = getPieChartOption(xData, yData);
+                            break;
+                        default:
+                            xData['data'] = [];
+                            xData['legend'] = [];
+                            $.each(fullData['x'], function (f, d) {
+                                xData['data'].push(d);
+                            });
+                            $.each(fullData['y'], function (f, d) {
+                                xData['legend'].push(titleMap[f]);
+                                var dArr = [];
+                                $.each(fullData['y'][f], function (sk, sv) {
+                                    dArr.push(sv[0])
+                                });
+                                var s = {
+                                    name: titleMap[f],
+                                    type: chartType,
+                                    data: dArr
+                                };
+                                yData.push(s);
+                            });
+                            chartOption = getNormalChartOption(xData, yData);
+                    }
+                    if (yData.length == 0)
+                        return;
+                    if (this._showLegend === false) {
+                        chartOption.legend = {};
+                    }
+                    var chart = echarts.init(document.getElementById(that._elementId + '_chartDiv'));
+                    chart.setOption(chartOption);
+                    chart.on('click', function (params) {
+                        if (that._chartClick != undefined)
+                            that._chartClick(params);
+                    });
                 }
             }
-            $.each(dataMap, function (k, v) {
-                var d = {
-                    name: titleMap[k],
-                    type: chartType,
-                    data: v
-                };
-                yData['data'].push(d);
-            });
-            var chartOption = geChartOption(xData, yData);
-            var chart = echarts.init(document.getElementById(that._elementId + '_chartDiv'));
-            chart.setOption(chartOption);
         },
         _renderList: function () {
             var that = this;
@@ -1310,9 +1401,10 @@
             var pagingRow = $.tmpl(Grid.statics.pagingRowTmpl, {});
             // select
 
-            var select = $('<div class="dataTables_length"><label><select id="'
+            var select = $('<div class="dataTables_length"><select id="'
                 + this._elementId
-                + '_length" class="form-control input-xsmall input-inline"></select></label></div>');
+                + '_length" class="form-control input-xsmall input-inline"></select>' +
+                '</div>');
 
             var options = this._pageSelect;
             if (options.indexOf(that._pageSize) == -1) {
@@ -1329,14 +1421,13 @@
                 });
                 select.find("select").append(option);
             }
-            if (!this._simplePaging)
-                pagingRow.find("[role='select']").append(select);
+            pagingRow.find("[role='select']").append(select);
             // info
             var info = $('<div class="dataTables_info" id="' + this._elementId
                 + '_info" role="status" aria-live="polite"></div>');
             var text = "<label style='font-size: initial;'>当前 "
                 + (this._total == 0 ? "0" : ((this._pageNum - 1)
-                    * this._pageSize + 1))
+                * this._pageSize + 1))
                 + " 到 "
                 + ((this._pageNum * this._pageSize) > this._total ? this._total
                     : (this._pageNum * this._pageSize)) + " 共 "
@@ -1540,23 +1631,32 @@
                 this._afterInit();
         },
         _uniform: function () {
-            if (!$().uniform) {
-                return;
+            if ($().select2) {
+                var selects = $("select");
+                if (selects.size() > 0) {
+                    selects.each(function () {
+                        $(this).select2();
+                    });
+                }
             }
-            var test = $("input[type=checkbox]:not(.toggle), input[type=radio]:not(.toggle)");
-            if (test.size() > 0) {
-                test.each(function () {
-                    $(this).show();
-                    $(this).uniform();
-                });
+            if ($().uniform) {
+                var checks = $("input[type=checkbox]:not(.toggle), input[type=radio]:not(.toggle)");
+                if (checks.size() > 0) {
+                    checks.each(function () {
+                        $(this).show();
+                        $(this).uniform();
+                    });
+                }
             }
-        },
+        }
+        ,
         // 销毁
         _remove: function () {
             if (this.$gridWrapper.remove != undefined) {
                 this.$gridWrapper.remove();
             }
-        },
+        }
+        ,
         // 重新加载
         _reload: function (options) {
             if (options != undefined) {

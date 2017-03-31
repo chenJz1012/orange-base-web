@@ -765,15 +765,7 @@
                     "name_": data.name
                 });
                 if (data.uploadUrl === undefined) {
-                    data.uploadUrl = App.href + "/api/common/uploadFile" + "?orange_base_token=" + App.token
-                } else {
-                    if (data.uploadUrl.indexOf("orange_base_token=") == -1) {
-                        if (data.uploadUrl.indexOf("?") != -1) {
-                            data.uploadUrl += ("&orange_base_token=" + App.token);
-                        } else {
-                            data.uploadUrl += ("?orange_base_token=" + App.token);
-                        }
-                    }
+                    data.uploadUrl = App.href + "/api/common/uploadFile";
                 }
                 if (data.isAjaxUpload) {
 
@@ -881,15 +873,7 @@
                     "name_": data.name
                 });
                 if (data.uploadUrl === undefined) {
-                    data.uploadUrl = App.href + "/api/common/uploadImage" + "?orange_base_token=" + App.token
-                } else {
-                    if (data.uploadUrl.indexOf("orange_base_token=") == -1) {
-                        if (data.uploadUrl.indexOf("?") != -1) {
-                            data.uploadUrl += ("&orange_base_token=" + App.token);
-                        } else {
-                            data.uploadUrl += ("?orange_base_token=" + App.token);
-                        }
-                    }
+                    data.uploadUrl = App.href + "/api/common/uploadImage";
                 }
                 if (data.isAjaxUpload) {
                     // 上传符号
@@ -1013,7 +997,7 @@
                 });
                 var chkboxType = data.chkboxType === undefined ? {"Y": "p", "N": "p"} : data.chkboxType;
                 var beforeCheck = data.beforeCheck === undefined ? function () {
-                    } : data.beforeCheck;
+                } : data.beforeCheck;
                 var setting = {
                     check: {
                         enable: (data.checkable === undefined ? true : data.checkable),
@@ -1138,9 +1122,9 @@
                                 .create('#' + ele.attr("id"),
                                     {
                                         uploadJson: App.href
-                                        + '/api/KE/fileUpload?orange_base_token=' + App.token,
+                                        + '/api/KE/fileUpload',
                                         fileManagerJson: App.href
-                                        + '/api/KE/fileManager?orange_base_token=' + App.token,
+                                        + '/api/KE/fileManager',
                                         minWidth: 0,
                                         width: edWith,
                                         height: (ele
@@ -1176,7 +1160,7 @@
                 + '<input type="hidden" name="${attName_}" class="att"/>'
                 + '</tr>';
             var deleteStr = '<span >删除</span>';
-            var uploadUrl = App.href + '/api/common/uploadFiles?orange_base_token=' + App.token;
+            var uploadUrl = App.href + '/api/common/uploadFiles';
             var files = $("input[role=fileuploadInput]");
             if (files.length > 0) {
                 $.each(files, function (i, file) {
@@ -1184,13 +1168,6 @@
                     var currentData = {};
                     if (element_data.uploadUrl !== undefined)
                         uploadUrl = element_data.uploadUrl;
-                    if (uploadUrl.indexOf("orange_base_token") == -1) {
-                        if (uploadUrl.indexOf("?") != -1) {
-                            uploadUrl += ("&orange_base_token=" + App.token);
-                        } else {
-                            uploadUrl += ("?orange_base_token=" + App.token);
-                        }
-                    }
                     $('#fileupload_' + element_data.id).fileupload(
                         {
                             url: uploadUrl,
@@ -1294,13 +1271,6 @@
                 return;
             var ids = fileIds.toString().split(",");
             var fileInfoUrl = (elementData.fileInfoUrl === undefined ? (App.href + "/api/common/attachment") : elementData.fileInfoUrl);
-            if (fileInfoUrl.indexOf("orange_base_token=") == -1) {
-                if (fileInfoUrl.indexOf("?") != -1) {
-                    fileInfoUrl += ("&orange_base_token=" + App.token);
-                } else {
-                    fileInfoUrl += ("?orange_base_token=" + App.token);
-                }
-            }
             var dataParam = (elementData.dataParam === undefined ? "attachmentId" : elementData.dataParam);
             for (var i in ids) {
                 var dataParamValue = {};
