@@ -38,7 +38,7 @@
             },
             contentType: "chart-bar",
             showContentType: true,
-            contentTypeItems: "table,list,chart-bar",
+            contentTypeItems: "table,list,chart-bar,chart-pie",
             pageNum: 1,//当前页码
             pageSize: 15,//每页显示条数
             idField: "id",//id域指定
