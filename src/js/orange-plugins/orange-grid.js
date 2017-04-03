@@ -19,9 +19,9 @@
         }
         console.error("data或url未定义");
     };
-    var dateDefaults = {};
+    Grid.dateDefaults = {};
     if (typeof(moment) != "undefined") {
-        dateDefaults = {
+        Grid.dateDefaults = {
             showDropdowns: true,
             linkedCalendars: false,
             autoApply: false,
@@ -67,11 +67,12 @@
                 "firstDay": 1
             },
             timePicker: true,
+            singleDatePicker: false,
             timePicker24Hour: true,
             timePickerSeconds: true
         };
     }
-    var getNormalChartOption = function (xData, yData) {
+    var getBarOrLineChartOption = function (xData, yData) {
         return {
             legend: {
                 x: 'center',
@@ -120,6 +121,20 @@
             series: yData
         };
     };
+    var getFunnelChartOption = function (xData, yData) {
+        return {
+            tooltip: {
+                trigger: 'item',
+                formatter: "{a}<br>{b} : {c}"
+            },
+            legend: {
+                selectedMode: 'single',
+                data: xData['legend']
+            },
+            calculable: true,
+            series: yData
+        };
+    };
     Grid.defaults = {
         autoLoad: true,
         pageNum: 1,
@@ -131,12 +146,14 @@
         indexNumText: "序号",
         contentType: "table",
         showContentType: true,
+        contentTypeItems: "table,card,list",
         showSearch: true,
         showPaging: true,
         simplePaging: true,
         actionColumnText: "操作",
         actionColumnAlign: "left",
         actionColumnWidth: "20%",
+        select2: false,
         pageSelect: [10, 15, 20, 50]
     };
     Grid.statics = {
@@ -153,12 +170,12 @@
         + '</form></div>',
         searchElementTmpl: '<div class="col-md-${span_}"><div class="form-group">'
         + '</div></div>',
-        gridWrapperTmpl: '<div id="${id_}_wrapper" class="dataTables_wrapper no-footer"></div>',
-        tableRowTmpl: '<div role="content" class="table-scrollable"></div>',
-        cardRowTmpl: '<div role="content" class="table-scrollable" style="margin-top: 10px;margin-bottom: 0px;"></div>',
-        listRowTmpl: '<div role="content" class="table-scrollable" style="margin-top: 10px;margin-bottom: 0px;"></div>',
-        chartRowTmpl: '<div role="content" class="table-scrollable" style="margin-top: 10px;margin-bottom: 0px;"></div>',
-        pagingRowTmpl: '<div class="row"><div role="select" class="col-md-2 col-sm-6"></div><div role="info" class="col-md-3 col-sm-6"></div><div role="goPage" class="col-md-2 col-sm-6" style="text-align: right;"></div><div role="page" class="col-md-5 col-sm-6"></div></div>',
+        gridWrapperTmpl: '<div id="${id_}_wrapper" class="dataTables_wrapper table-responsive no-footer"></div>',
+        tableRowTmpl: '<div role="content" class="row table-scrollable"></div>',
+        cardRowTmpl: '<div role="content" class="row table-scrollable" style="margin-top: 10px;margin-bottom: 0px;"></div>',
+        listRowTmpl: '<div role="content" class="row table-scrollable" style="margin-top: 10px;margin-bottom: 0px;"></div>',
+        chartRowTmpl: '<div role="content" class="row table-scrollable" style="margin-top: 10px;margin-bottom: 0px;"></div>',
+        pagingRowTmpl: '<div class="row"><div role="select" class="col-md-3 col-sm-12 hidden-xs hidden-sm"></div><div role="info" class="col-md-2 col-sm-12 hidden-xs hidden-sm"></div><div role="goPage" class="col-md-2 col-sm-12 hidden-xs hidden-sm" style="text-align: right;"></div><div role="page" class="col-md-5 col-sm-12"></div></div>',
         labelTmpl: '<label>${label_}</label>',
         textTmpl: '<input type="text" name="${name_}" id="${id_}" class="form-control ${span_}" placeholder="${placeholder_}" value="${value_}">',
         passwordTmpl: '<input type="password" class="form-control ${class_}">',
@@ -287,6 +304,7 @@
             this._simplePaging = options.simplePaging;
             this._chartClick = options.chartClick;
             this._showLegend = options.showLegend;
+            this._select2 = options.select2;
             if (options.tools != undefined) {
                 // 左侧工具栏
                 this._tools = options.tools;
@@ -375,7 +393,7 @@
         _init: function () {
             this._remove();
             this._renderEles();
-            this._regiestEvents();
+            this._registerEvents();
             this._doAfterInit();
         },
         // 渲染元素
@@ -712,7 +730,7 @@
                                 });
                                 itemDiv.find(".form-group").append(ele);
                                 var config = (item.config == undefined ? {} : item.config);
-                                var option = $.extend(true, dateDefaults, config);
+                                var option = $.extend(true, Grid.dateDefaults, config);
                                 if (item.callback != undefined) {
                                     ele.find('[role="date-input"]').daterangepicker(option, item.callback);
                                 } else {
@@ -840,6 +858,7 @@
                 '<a role="chart-bar" class="btn btn-large btn-info" title="柱状图"><i class="fa fa-bar-chart-o"></i></a>' +
                 '<a role="chart-line" class="btn btn-large btn-info" title="折线图"><i class="fa fa-line-chart"></i></a>' +
                 '<a role="chart-pie" class="btn btn-large btn-info" title="饼图"><i class="fa fa-pie-chart"></i></a>' +
+                '<a role="chart-funnel" class="btn btn-large btn-info" title="漏斗"><i class="fa fa-filter"></i></a>' +
                 '</div>' +
                 '</div></div>');
             if (this._showContentType) {
@@ -856,7 +875,7 @@
             this.$contentTypeBtn.find("a[role=" + this._contentType + "]").addClass("active");
             this.$contentTypeBtn.find("a[role!=" + this._contentType + "]").removeClass("active");
             if (/chart-([a-z]+)/.test(this._contentType)) {
-                this._renderChart(that._contentType.match('chart-([a-z]+)')[1]);
+                that._renderChart(that._contentType.match('chart-([a-z]+)')[1]);
             } else {
                 switch (this._contentType) {
                     case "table":
@@ -900,8 +919,12 @@
                             var field = column.field;
                             var data = grid[field];
                             var title = column.title;
-                            if (column.format != undefined) {
-                                data = column.format(num, grid);
+                            if (column.chartFormat != undefined) {
+                                data = column.chartFormat(num, grid);
+                            } else {
+                                if (column.format != undefined) {
+                                    data = column.format(num, grid);
+                                }
                             }
                             if (column.chartX) {
                                 if (fullData['x'] == undefined) {
@@ -955,6 +978,38 @@
                             });
                             chartOption = getPieChartOption(xData, yData);
                             break;
+                        case 'funnel':
+                            xData['data'] = [];
+                            xData['legend'] = [];
+                            $.each(fullData['x'], function (f, d) {
+                                xData['data'].push(d);
+                            });
+                            var i = 0;
+                            $.each(fullData['y'], function (f, d) {
+                                xData['legend'].push(titleMap[f]);
+                                var dArr = [];
+                                $.each(fullData['y'][f], function (sk, sv) {
+                                    var name = fullData['x'][sk];
+                                    dArr.push({
+                                        'name': name,
+                                        'value': sv[0]
+                                    })
+                                });
+                                var s = {
+                                    type: chartType,
+                                    name: titleMap[f],
+                                    min: 0,
+                                    width: '80%',
+                                    minSize: '0%',
+                                    maxSize: '100%',
+                                    sort: 'descending',
+                                    data: dArr
+                                };
+                                yData.push(s);
+                                i++;
+                            });
+                            chartOption = getFunnelChartOption(xData, yData);
+                            break;
                         default:
                             xData['data'] = [];
                             xData['legend'] = [];
@@ -974,19 +1029,23 @@
                                 };
                                 yData.push(s);
                             });
-                            chartOption = getNormalChartOption(xData, yData);
+                            chartOption = getBarOrLineChartOption(xData, yData);
                     }
-                    if (yData.length == 0)
+                    if (xData['data'].length == 0)
                         return;
                     if (this._showLegend === false) {
                         chartOption.legend = {};
                     }
-                    var chart = echarts.init(document.getElementById(that._elementId + '_chartDiv'));
-                    chart.setOption(chartOption);
-                    chart.on('click', function (params) {
-                        if (that._chartClick != undefined)
-                            that._chartClick(params);
-                    });
+                    setTimeout($.proxy(function () {
+                        var t = this;
+                        var chart = echarts.init(document.getElementById(t._elementId + '_chartDiv'));
+                        chart.setOption(chartOption);
+                        chart.on('click', function (params) {
+                            if (t._chartClick != undefined)
+                                t._chartClick(params);
+                        });
+                    }, that), 500);
+
                 }
             }
         },
@@ -1403,7 +1462,7 @@
 
             var select = $('<div class="dataTables_length"><select id="'
                 + this._elementId
-                + '_length" class="form-control input-xsmall input-inline"></select>' +
+                + '_length" class="form-control input-sm input-inline"></select>' +
                 '</div>');
 
             var options = this._pageSelect;
@@ -1422,16 +1481,10 @@
                 select.find("select").append(option);
             }
             pagingRow.find("[role='select']").append(select);
-            // info
+
             var info = $('<div class="dataTables_info" id="' + this._elementId
                 + '_info" role="status" aria-live="polite"></div>');
-            var text = "<label style='font-size: initial;'>当前 "
-                + (this._total == 0 ? "0" : ((this._pageNum - 1)
-                * this._pageSize + 1))
-                + " 到 "
-                + ((this._pageNum * this._pageSize) > this._total ? this._total
-                    : (this._pageNum * this._pageSize)) + " 共 "
-                + this._total + "</label>";
+            var text = "<label style='font-size: initial;'>" + this._pageNum + "/" + this._getTotalPage() + "</label>";
             info.html(text);
             if (!this._simplePaging)
                 pagingRow.find("[role='info']").append(info);
@@ -1508,12 +1561,32 @@
                 });
                 ul.append(lastLi);
             };
+            var renderSimplePageEle = function (ul, pageNum, totalP) {
+                var pervLi = $.tmpl(liTmpl, {
+                    "class_": pageNum == 1 ? "prev disabled" : "prev",
+                    "id_": "",
+                    "pageto_": pageNum - 1,
+                    "num_": '上一页'
+                });
+                ul.append(pervLi);
+                var nextLi = $.tmpl(liTmpl, {
+                    "class_": pageNum == totalP ? "next disabled" : "next",
+                    "id_": "",
+                    "pageto_": pageNum + 1,
+                    "num_": '下一页'
+                });
+                ul.append(nextLi);
+            };
             var page = $('<div class="dataTables_paginate" id="'
                 + this._elementId + '_paginate"></div>');
             var ul = $('<ul class="pagination" style="visibility: visible;"></ul>');
             page.append(ul);
             var totalP = this._getTotalPage();
-            renderPageEle(ul, this._pageNum, totalP);
+            if (!this._simplePaging) {
+                renderPageEle(ul, this._pageNum, totalP);
+            } else {
+                renderSimplePageEle(ul, this._pageNum, totalP);
+            }
             pagingRow.find("[role='page']").append(page);
             var goPage = $('<div class="dataTables_paginate input-group">'
                 + '			<input type="text" id="goInput" class="form-control input-xs input-inline" style="width: 112px;" placeholder="输入跳转页...">'
@@ -1527,17 +1600,17 @@
         },
         _getTotalPage: function () {
             var totalP = 0;
-            var totalcount = this._total;
+            var totalCount = this._total;
             var pagesize = this._pageSize;
-            if (totalcount % pagesize != 0) {
-                totalP = Math.floor(totalcount / pagesize) + 1;
+            if (totalCount % pagesize != 0) {
+                totalP = Math.floor(totalCount / pagesize) + 1;
             } else {
-                totalP = Math.floor(totalcount / pagesize);
+                totalP = Math.floor(totalCount / pagesize);
             }
             return totalP;
         },
         // 注册事件
-        _regiestEvents: function () {
+        _registerEvents: function () {
             var that = this;
             // checkbox相关
             this.$gridWrapper.find('.group-checkable').change(
@@ -1624,21 +1697,24 @@
                 });
             });
             this._uniform();
+            this._doSelect2();
         },
         // 执行回调
         _doAfterInit: function () {
             if (this._afterInit != undefined)
                 this._afterInit();
         },
-        _uniform: function () {
-            if ($().select2) {
-                var selects = $("select");
+        _doSelect2: function () {
+            if (this._select2 && $().select2) {
+                var selects = this.$element.find("select");
                 if (selects.size() > 0) {
                     selects.each(function () {
                         $(this).select2();
                     });
                 }
             }
+        },
+        _uniform: function () {
             if ($().uniform) {
                 var checks = $("input[type=checkbox]:not(.toggle), input[type=radio]:not(.toggle)");
                 if (checks.size() > 0) {
