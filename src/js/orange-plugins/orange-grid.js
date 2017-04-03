@@ -1735,6 +1735,9 @@
         ,
         // 销毁
         _remove: function () {
+            if (this.$contentTypeDiv.remove != undefined) {
+                this.$contentTypeDiv.remove();
+            }
             if (this.$gridWrapper.remove != undefined) {
                 this.$gridWrapper.remove();
             }
