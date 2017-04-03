@@ -171,10 +171,10 @@
         searchElementTmpl: '<div class="col-md-${span_}"><div class="form-group">'
         + '</div></div>',
         gridWrapperTmpl: '<div id="${id_}_wrapper" class="dataTables_wrapper table-responsive no-footer"></div>',
-        tableRowTmpl: '<div role="content" class="row table-scrollable"></div>',
-        cardRowTmpl: '<div role="content" class="row table-scrollable" style="margin-top: 10px;margin-bottom: 0px;"></div>',
-        listRowTmpl: '<div role="content" class="row table-scrollable" style="margin-top: 10px;margin-bottom: 0px;"></div>',
-        chartRowTmpl: '<div role="content" class="row table-scrollable" style="margin-top: 10px;margin-bottom: 0px;"></div>',
+        tableRowTmpl: '<div role="content" class="row"></div>',
+        cardRowTmpl: '<div role="content" class="row" style="margin-top: 10px;margin-bottom: 0px;"></div>',
+        listRowTmpl: '<div role="content" class="row" style="margin-top: 10px;margin-bottom: 0px;"></div>',
+        chartRowTmpl: '<div role="content" class="row" style="margin-top: 10px;margin-bottom: 0px;"></div>',
         pagingRowTmpl: '<div class="row"><div role="select" class="col-md-3 col-sm-12 hidden-xs hidden-sm"></div><div role="info" class="col-md-2 col-sm-12 hidden-xs hidden-sm"></div><div role="goPage" class="col-md-2 col-sm-12 hidden-xs hidden-sm" style="text-align: right;"></div><div role="page" class="col-md-5 col-sm-12"></div></div>',
         labelTmpl: '<label>${label_}</label>',
         textTmpl: '<input type="text" name="${name_}" id="${id_}" class="form-control ${span_}" placeholder="${placeholder_}" value="${value_}">',
@@ -193,7 +193,7 @@
         + '<input type="radio" id="${id_}" name="${name_}" value="${value_}">${text_}</label>',
         displayTmpl: '<p class="form-control-static">${text_}</p>',
         buttonTmpl: '<button type="${type_}" class="${class_}" title="${title_}" ${attribute_}>${text_}</button>',
-        tableTmpl: '<table class="table table-striped table-bordered table-hover dataTable no-footer" id="${id_}_table"  aria-describedby="${id_}_info"></table>',
+        tableTmpl: '<table class="table table-scrollable table-striped table-bordered table-hover dataTable no-footer" id="${id_}_table"  aria-describedby="${id_}_info"></table>',
         alertTmpl: '<div class="alert alert-${type_} alert-dismissable" role="alert">'
         + '<button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>'
         + '<strong>提示!</strong>${alert_}</div>'
