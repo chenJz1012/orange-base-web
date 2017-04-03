@@ -852,12 +852,7 @@
         },
         _renderGridWrapper: function () {
             var that = this;
-            var gridWrapper = $.tmpl(Grid.statics.gridWrapperTmpl, {
-                "id_": that._elementId
-            });
-            this.$element.append(gridWrapper);
-            this.$gridWrapper = gridWrapper;
-            var contentTypeBtn = $('<div class="row">' +
+            var contentTypeDiv = $('<div class="row">' +
                 '<div class="col-lg-12">' +
                 '<div id="tab" class="btn-group pull-right">' +
                 '<a role="table" class="btn btn-large btn-info" title="表格" ><i class="fa fa-table"></i></a>' +
@@ -869,19 +864,24 @@
                 '<a role="chart-funnel" class="btn btn-large btn-info" title="漏斗"><i class="fa fa-filter"></i></a>' +
                 '</div>' +
                 '</div></div>');
+            this.$element.append(contentTypeDiv);
+            this.$contentTypeDiv = contentTypeDiv;
+            var gridWrapper = $.tmpl(Grid.statics.gridWrapperTmpl, {
+                "id_": that._elementId
+            });
+            this.$element.append(gridWrapper);
+            this.$gridWrapper = gridWrapper;
             if (this._showContentType) {
                 if (this._options.contentTypeItems != undefined) {
-                    contentTypeBtn.find("a").each(function (i) {
+                    contentTypeDiv.find("a").each(function (i) {
                         if (that._options.contentTypeItems.indexOf($(this).attr("role")) == -1) {
                             $(this).remove();
                         }
                     });
                 }
-                gridWrapper.append(contentTypeBtn);
             }
-            this.$contentTypeBtn = contentTypeBtn;
-            this.$contentTypeBtn.find("a[role=" + this._contentType + "]").addClass("active");
-            this.$contentTypeBtn.find("a[role!=" + this._contentType + "]").removeClass("active");
+            this.$contentTypeDiv.find("a[role=" + this._contentType + "]").addClass("active");
+            this.$contentTypeDiv.find("a[role!=" + this._contentType + "]").removeClass("active");
             if (/chart-([a-z]+)/.test(this._contentType)) {
                 that._renderChart(that._contentType.match('chart-([a-z]+)')[1]);
             } else {
@@ -902,8 +902,8 @@
             if (this._showPaging) {
                 this._renderPaging();
             }
-            this.$contentTypeBtn.find("a").off("click");
-            this.$contentTypeBtn.find("a").on("click", function () {
+            this.$contentTypeDiv.find("a").off("click");
+            this.$contentTypeDiv.find("a").on("click", function () {
                 var role = $(this).attr("role");
                 that._reload({
                     contentType: role
