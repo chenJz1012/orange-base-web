@@ -171,10 +171,18 @@
         searchElementTmpl: '<div class="col-md-${span_}"><div class="form-group">'
         + '</div></div>',
         gridWrapperTmpl: '<div id="${id_}_wrapper" class="dataTables_wrapper table-responsive no-footer"></div>',
-        tableRowTmpl: '<div role="content" class="row"></div>',
-        cardRowTmpl: '<div role="content" class="row" style="margin-top: 10px;margin-bottom: 0px;"></div>',
-        listRowTmpl: '<div role="content" class="row" style="margin-top: 10px;margin-bottom: 0px;"></div>',
-        chartRowTmpl: '<div role="content" class="row" style="margin-top: 10px;margin-bottom: 0px;"></div>',
+        tableRowTmpl: '<div class="row">' +
+        '<div role="content" class="col-xs-12 col-sm-12 col-md-12 col-lg-12"></div>' +
+        '</div>',
+        cardRowTmpl: '<div class="row" style="margin-top: 10px;margin-bottom: 0px;">' +
+        '<div role="content" class="col-xs-12 col-sm-12 col-md-12 col-lg-12"></div>' +
+        '</div>',
+        listRowTmpl: '<div class="row" style="margin-top: 10px;margin-bottom: 0px;">' +
+        '<div role="content" class="col-xs-12 col-sm-12 col-md-12 col-lg-12"></div>' +
+        '</div>',
+        chartRowTmpl: '<div class="row" style="margin-top: 10px;margin-bottom: 0px;">' +
+        '<div role="content" class="col-xs-12 col-sm-12 col-md-12 col-lg-12"></div>' +
+        '</div>',
         pagingRowTmpl: '<div class="row"><div role="select" class="col-md-3 col-sm-12 hidden-xs hidden-sm"></div><div role="info" class="col-md-2 col-sm-12 hidden-xs hidden-sm"></div><div role="goPage" class="col-md-2 col-sm-12 hidden-xs hidden-sm" style="text-align: right;"></div><div role="page" class="col-md-5 col-sm-12"></div></div>',
         labelTmpl: '<label>${label_}</label>',
         textTmpl: '<input type="text" name="${name_}" id="${id_}" class="form-control ${span_}" placeholder="${placeholder_}" value="${value_}">',
@@ -907,7 +915,7 @@
             var that = this;
             var chartRow = $.tmpl(Grid.statics.chartRowTmpl, {});
             var div = $('<div class="col-xs-12" id="' + that._elementId + '_chartDiv" style="height:400px;"></div>');
-            chartRow.append(div);
+            chartRow.find("div[role=content]").append(div);
             this.$gridWrapper.append(chartRow);
             var fullData = {};
             var titleMap = {};
@@ -1135,7 +1143,7 @@
                 }
                 div.append(ele);
             });
-            listRow.append(div);
+            listRow.find("div[role=content]").append(div);
             this.$gridWrapper.append(listRow);
         },
         _renderCard: function () {
@@ -1153,14 +1161,14 @@
                 if (that._grids.length == 0) {
                     var emptyRow = $('<div class="row"></div>');
                     emptyRow.append('<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12"><div style="text-align: center;" class="thumbnail">暂无数据!</div></div>');
-                    cardRow.append(emptyRow);
+                    cardRow.find("div[role=content]").append(emptyRow);
                 } else {
                     var row = {};
                     $.each(that._grids, function (i, grid) {
                         var num = (that._pageNum - 1) * that._pageSize + i + 1;
                         if ((i + 1) % 3 == 1) {
                             row = $('<div class="row"></div>');
-                            cardRow.append(row);
+                            cardRow.find("div[role=content]").append(row);
                         }
                         var ele = $('<div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">' +
                             '<div class="thumbnail col-lg-12">' +
@@ -1252,7 +1260,6 @@
             var tdTmpl = '<td class="${class_}" style="vertical-align: middle;"></td>';
 
             var tableRow = $.tmpl(Grid.statics.tableRowTmpl, {});
-
             var table = $.tmpl(Grid.statics.tableTmpl, {
                 "id_": that._elementId
             });
@@ -1451,7 +1458,7 @@
                 renderLoadingTbody(tbody);
             }
             table.append(tbody);
-            tableRow.append(table);
+            tableRow.find("div[role=content]").append(table);
             this.$gridWrapper.append(tableRow);
         },
         // 渲染分页
