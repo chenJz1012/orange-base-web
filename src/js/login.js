@@ -1,11 +1,11 @@
 ;
 (function ($, window, document, undefined) {
-    var vkey = "bi_" + new Date().getTime() + "_" + Math.floor(Math.random() * 10);
+    var vkey = "orange_" + new Date().getTime() + "_" + Math.floor(Math.random() * 10);
 
     function initLogin() {
         $("#captcha_img").attr("src", App.href + "/api/noneAuth/captcha?vkey=" + vkey);
         $("#captcha_a").on("click", function () {
-            vkey = "bi_" + new Date().getTime() + "_" + Math.floor(Math.random() * 10);
+            vkey = "orange_" + new Date().getTime() + "_" + Math.floor(Math.random() * 10);
             $("#captcha_img").attr("src", App.href + "/api/noneAuth/captcha?vkey=" + vkey + "&s=" + new Date().getTime());
         });
         $('#username,#password,#vcode').bind('keypress', function (event) {
@@ -16,9 +16,33 @@
         $("#login_btn").on("click", login);
     }
 
+    function alertValidate(alertText) {
+        var alertTmpl = '<div class="alert alert-${type_} alert-dismissable" role="alert">'
+            + '<button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>'
+            + '${alert_}</div>';
+        var alertDiv = $.tmpl(alertTmpl, {
+            "type_": 'warning',
+            "alert_": alertText
+        });
+        $("#login-form").prepend(alertDiv);
+        alertDiv.delay(5 * 1000).fadeOut();
+        App.scrollTo(alertDiv, -200);
+    }
+
     var login = function () {
-        if ($("#username").val() == "" || $("#username").val() == "" || $("#vcode").val() == "") {
-            alert("登录名,密码,验证码不能为空!");
+        if ($.trim($("#username").val()) == "") {
+            alertValidate("登录名不能为空!");
+            $("#captcha_a").trigger("click");
+            return;
+        }
+        if ($.trim($("#password").val()) == "") {
+            alertValidate("密码不能为空!");
+            $("#captcha_a").trigger("click");
+            return;
+        }
+        if ($.trim($("#vcode").val()) == "") {
+            alertValidate('验证码不能为空!');
+            $("#captcha_a").trigger("click");
             return;
         }
         var fields = JSON.stringify(
@@ -39,7 +63,7 @@
                     $.cookie('tc_t', result.token, {expires: 7});
                     window.location.href = App.href;
                 } else {
-                    alert(result.message);
+                    alertValidate(result.message);
                 }
             }
         });

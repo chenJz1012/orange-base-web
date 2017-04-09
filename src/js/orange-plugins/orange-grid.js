@@ -81,7 +81,6 @@
             },
             tooltip: {
                 trigger: 'axis',
-                formatter: '{b} <br/> {a}: {c}',
                 axisPointer: {
                     type: 'cross',
                     animation: false,
@@ -153,6 +152,7 @@
         actionColumnText: "操作",
         actionColumnAlign: "left",
         actionColumnWidth: "20%",
+        chartPieType: 0,
         select2: false,
         pageSelect: [10, 15, 20, 50]
     };
@@ -377,7 +377,7 @@
                     if (data.code === 200) {
                         that._setData(data.data);
                         that._init();
-                    } else if (data.code === 401) {
+                    } else if (data.code === 401 || data.code === 403) {
                         that._alert(data.message + ";请重新登录！", App.redirectLogin);
                     } else {
                         that._alert(data.message);
@@ -755,28 +755,6 @@
                         });
             }
             searchFormRow.append("<hr>");
-            if (buttons != undefined && buttons.length > 0) {
-                $.each(buttons, function (index, button) {
-                    var btn = $.tmpl(Grid.statics.buttonTmpl, {
-                        "class_": (button.cls == undefined ? "btn btn-default"
-                            : button.cls),
-                        "text_": (button.text == undefined ? "未定义"
-                            : button.text),
-                        "title_": (button.title == undefined ? button.text
-                            : button.title),
-                        "type_": (button.type == undefined ? "button"
-                            : button.type)
-                    });
-                    if (button.icon != undefined)
-                        btn.prepend("<i class='" + button.icon + "'><i>");
-                    if (button.handle != undefined)
-                        btn.on("click", function () {
-                            button.handle(that);
-                        });
-                    searchFormRow.find('.form-actions').append(btn);
-                    btn.after("&nbsp;");
-                });
-            }
             if (hide) {
                 showBtn = $.tmpl(Grid.statics.buttonTmpl, {
                     "class_": "btn btn-primary",
@@ -840,6 +818,28 @@
             });
             searchFormRow.find('.form-actions').append(searchbtn);
             searchbtn.after("&nbsp;");
+            if (buttons != undefined && buttons.length > 0) {
+                $.each(buttons, function (index, button) {
+                    var btn = $.tmpl(Grid.statics.buttonTmpl, {
+                        "class_": (button.cls == undefined ? "btn btn-default"
+                            : button.cls),
+                        "text_": (button.text == undefined ? "未定义"
+                            : button.text),
+                        "title_": (button.title == undefined ? button.text
+                            : button.title),
+                        "type_": (button.type == undefined ? "button"
+                            : button.type)
+                    });
+                    if (button.icon != undefined)
+                        btn.prepend("<i class='" + button.icon + "'><i>");
+                    if (button.handle != undefined)
+                        btn.on("click", function () {
+                            button.handle(that);
+                        });
+                    searchFormRow.find('.form-actions').append(btn);
+                    btn.after("&nbsp;");
+                });
+            }
             this.$element.append(searchFormRow);
             this._uniform();
             this.$searchForm = searchFormRow.find("form[ele-type='search']");
@@ -866,20 +866,21 @@
                 '</div></div>');
             this.$element.append(contentTypeDiv);
             this.$contentTypeDiv = contentTypeDiv;
+            if (this._options.contentTypeItems != undefined) {
+                that.$contentTypeDiv.find("a").each(function (i) {
+                    if (that._options.contentTypeItems.indexOf($(this).attr("role")) == -1) {
+                        $(this).hide();
+                    }
+                });
+            }
+            if (!this._showContentType) {
+                that.$contentTypeDiv.hide();
+            }
             var gridWrapper = $.tmpl(Grid.statics.gridWrapperTmpl, {
                 "id_": that._elementId
             });
             this.$element.append(gridWrapper);
             this.$gridWrapper = gridWrapper;
-            if (this._showContentType) {
-                if (this._options.contentTypeItems != undefined) {
-                    contentTypeDiv.find("a").each(function (i) {
-                        if (that._options.contentTypeItems.indexOf($(this).attr("role")) == -1) {
-                            $(this).remove();
-                        }
-                    });
-                }
-            }
             this.$contentTypeDiv.find("a[role=" + this._contentType + "]").addClass("active");
             this.$contentTypeDiv.find("a[role!=" + this._contentType + "]").removeClass("active");
             if (/chart-([a-z]+)/.test(this._contentType)) {
@@ -962,29 +963,57 @@
                     var yData = [];
                     switch (chartType) {
                         case 'pie':
-                            xData['data'] = [];
-                            xData['legend'] = [];
-                            $.each(fullData['x'], function (f, d) {
-                                xData['data'].push(d);
-                            });
-                            $.each(fullData['y'], function (f, d) {
-                                xData['legend'].push(titleMap[f]);
-                                var dArr = [];
-                                $.each(fullData['y'][f], function (sk, sv) {
-                                    var name = fullData['x'][sk];
-                                    dArr.push({
-                                        'name': name,
-                                        'value': sv[0]
-                                    })
+                            if (that._options.chartPieType == 0) {
+                                xData['data'] = [];
+                                xData['legend'] = [];
+                                $.each(fullData['x'], function (f, d) {
+                                    xData['data'].push(d);
                                 });
-                                var s = {
-                                    name: titleMap[f],
-                                    type: chartType,
-                                    data: dArr
-                                };
-                                yData.push(s);
-                            });
-                            chartOption = getPieChartOption(xData, yData);
+                                $.each(fullData['y'], function (f, d) {
+                                    xData['legend'].push(titleMap[f]);
+                                    var dArr = [];
+                                    $.each(fullData['y'][f], function (sk, sv) {
+                                        var name = fullData['x'][sk];
+                                        dArr.push({
+                                            'name': name,
+                                            'value': sv[0]
+                                        })
+                                    });
+                                    var s = {
+                                        name: titleMap[f],
+                                        type: chartType,
+                                        data: dArr
+                                    };
+                                    yData.push(s);
+                                });
+                                chartOption = getPieChartOption(xData, yData);
+                            } else {
+                                xData['data'] = [];
+                                xData['legend'] = [];
+                                $.each(fullData['x'], function (n, d) {
+                                    xData['data'].push(d);
+                                    xData['legend'].push(d);
+                                    var dArr = [];
+                                    $.each(fullData['y'], function (f, d) {
+                                        $.each(fullData['y'][f], function (sk, sv) {
+                                            if (n === sk) {
+                                                var name = titleMap[f];
+                                                dArr.push({
+                                                    'name': name,
+                                                    'value': sv[0]
+                                                })
+                                            }
+                                        });
+                                    });
+                                    var s = {
+                                        name: d,
+                                        type: chartType,
+                                        data: dArr
+                                    };
+                                    yData.push(s);
+                                });
+                                chartOption = getPieChartOption(xData, yData);
+                            }
                             break;
                         case 'funnel':
                             xData['data'] = [];
@@ -1007,6 +1036,7 @@
                                     type: chartType,
                                     name: titleMap[f],
                                     min: 0,
+                                    left: '5%',
                                     width: '80%',
                                     minSize: '0%',
                                     maxSize: '100%',
@@ -1114,12 +1144,11 @@
                     }
                 });
                 if (that._actionColumns != undefined) {
-                    var _index = i;
                     var current_data = grid;
                     $.each(that._actionColumns, function (k, colum) {
                         var visible = true;
                         if (colum.visible != undefined) {
-                            visible = colum.visible(_index, current_data);
+                            visible = colum.visible(num, current_data);
                         }
                         if (visible == false) {
                             return;
@@ -1384,15 +1413,22 @@
                     }
                     td.html(html);
                     tr.append(td);
+                    if (column.dataClick != undefined) {
+                        td.css("text-decoration", "underline");
+                        td.css("cursor", "pointer");
+                        td.css("color", "red");
+                        td.on("click", function () {
+                            column.dataClick(num, current_data);
+                        })
+                    }
                 });
                 if (that._actionColumns != undefined) {
                     var cltd = $.tmpl(tdTmpl, {});
-                    var _index = index;
                     var current_data = grid;
                     $.each(that._actionColumns, function (index, colum) {
                         var visible = true;
                         if (colum.visible != undefined) {
-                            visible = colum.visible(_index, current_data);
+                            visible = colum.visible(num, current_data);
                         }
                         if (visible == false) {
                             return;
