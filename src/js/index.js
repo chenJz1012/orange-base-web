@@ -3,7 +3,7 @@
  */
 ;
 (function ($, window, document, undefined) {
-    var token = $.cookie('tc_t');
+    var token = $.cookie('orange_token');
     if (token == undefined) {
         window.location.href = '../login.html';
     }

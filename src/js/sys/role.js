@@ -107,7 +107,7 @@
                             name: 'functions',
                             id: 'functions',//id
                             label: '菜单',//左边label
-                            url: App.href + "/api/sys/function/treeNodes?orange_token=" + App.token,
+                            url: App.href + "/api/sys/function/treeNodes",
                             expandAll: true,
                             autoParam: ["id", "name", "pId"],
                             chkStyle: "checkbox",
@@ -311,7 +311,7 @@
                                 name: 'functions',
                                 id: 'functions',
                                 label: '菜单',
-                                url: App.href + "/api/sys/function/treeNodes?orange_token=" + App.token,
+                                url: App.href + "/api/sys/function/treeNodes",
                                 expandAll: true,
                                 autoParam: ["id", "name", "pId"],
                                 chkStyle: "checkbox",

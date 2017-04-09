@@ -322,7 +322,7 @@
                     handle: function () {
                         $.ajaxFileUpload(
                             {
-                                url: that.manager.options.url.upload + "?orange_token=" + App.token + "&folderPath=" + that.currentPath,
+                                url: that.manager.options.url.upload + "?folderPath=" + that.currentPath,
                                 type: "POST",
                                 secureuri: false,
                                 fileElementId: "file_file_manager_file",
@@ -589,7 +589,7 @@
             var folderPath = getSimplePath(this.folder.currentPath);
             var fileName = this.name;
             var that = this;
-            window.open(that.folder.manager.options.url.download + "?orange_token=" + App.token + "&folderPath=" + folderPath + "&fileName=" + fileName);
+            window.open(that.folder.manager.options.url.download + "?folderPath=" + folderPath + "&fileName=" + fileName);
         },
         unCompress: function () {
             var that = this;

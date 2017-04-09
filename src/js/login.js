@@ -60,7 +60,7 @@
             data: fields,
             success: function (result) {
                 if (result.code === 200) {
-                    $.cookie('tc_t', result.token, {expires: 7});
+                    $.cookie('orange_token', result.token, {expires: 7});
                     window.location.href = App.href;
                 } else {
                     alertValidate(result.message);

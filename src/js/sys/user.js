@@ -151,7 +151,7 @@
                             name: 'roles',//name
                             id: 'roles',//id
                             label: '角色',//左边label
-                            url: App.href + "/api/sys/role/treeNodes?orange_token=" + App.token,
+                            url: App.href + "/api/sys/role/treeNodes",
                             expandAll: true,
                             autoParam: ["id", "name", "pId"],
                             chkStyle: "checkbox",
@@ -408,7 +408,7 @@
                                 name: 'roles',//name
                                 id: 'roles',//id
                                 label: '角色',//左边label
-                                url: App.href + "/api/sys/role/treeNodes?orange_token=" + App.token,
+                                url: App.href + "/api/sys/role/treeNodes",
                                 expandAll: true,
                                 autoParam: ["id", "name", "pId"],
                                 chkStyle: "checkbox",

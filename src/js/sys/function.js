@@ -103,7 +103,7 @@
                             name: 'parentId',
                             id: 'parentId',//id
                             label: '父菜单',//左边label
-                            url: App.href + "/api/sys/function/treeNodes?orange_token=" + App.token,
+                            url: App.href + "/api/sys/function/treeNodes",
                             expandAll: true,
                             autoParam: ["id", "name", "pId"],
                             chkStyle: "radio"
@@ -231,7 +231,7 @@
                                 name: 'parentId',
                                 id: 'parentId',
                                 label: '父菜单',
-                                url: App.href + "/api/sys/function/treeNodes?orange_token=" + App.token,
+                                url: App.href + "/api/sys/function/treeNodes",
                                 expandAll: true,
                                 autoParam: ["id", "name", "pId"],
                                 chkStyle: "radio"

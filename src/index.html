@@ -184,7 +184,7 @@
                 dataType: "json",
                 success: function (result) {
                     if (result.code == 200) {
-                        $.cookie('tc_t', null);
+                        $.cookie('orange_token', null);
                         window.location.href = App.href + "/login.html";
                     } else {
                         alert(result.message);
