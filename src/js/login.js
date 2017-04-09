@@ -64,6 +64,7 @@
                     window.location.href = App.href;
                 } else {
                     alertValidate(result.message);
+                    $("#captcha_a").trigger("click");
                 }
             }
         });
