@@ -121,4 +121,18 @@
         return $("#main-body");
     };
 
+    App.alert = function (alertText) {
+        var alertTmpl = '<div class="alert alert-warning alert-dismissable" role="alert">'
+            + '<button type="button" class="close" data-dismiss="alert">' +
+            '<span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>'
+        '</div>';
+        var alertDiv = $('<div class="alert alert-warning alert-dismissable" role="alert">'
+            + '<button type="button" class="close" data-dismiss="alert">' +
+            '<span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button></div>');
+        alertDiv.append(alertText);
+        $('.page-wrapper').prepend(alertDiv);
+        alertDiv.delay(3 * 1000).fadeOut();
+        App.scrollTo(alertDiv, -200);
+    }
+
 })(jQuery, window, document);

@@ -163,7 +163,7 @@
                             );
                         refreshHref(ul);
                     } else if (result.code === 401) {
-                        alert("token失效,请登录!");
+                        App.alert("token失效,请登录!");
                         window.location.href = '../login.html';
                     }
                 },
@@ -232,7 +232,7 @@
                             );
                         refreshHref(ul);
                     } else if (result.code === 401) {
-                        alert("token失效,请登录!");
+                        App.alert("token失效,请登录!");
                         window.location.href = '../login.html';
                     }
                 },
