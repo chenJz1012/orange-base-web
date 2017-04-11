@@ -99,9 +99,7 @@
                 type: 'category',
                 data: xData['data']
             },
-            yAxis: {
-                type: 'value'
-            },
+            yAxis: xData['axis'],
             series: yData
         };
     };
@@ -956,11 +954,27 @@
                                     titleMap[field] = title;
                                 }
                             }
+                            if (column.chartY2) {
+                                if (fullData['y2'] == undefined) {
+                                    fullData['y2'] = {};
+                                }
+                                if (fullData['y2'][field] == undefined) {
+                                    fullData['y2'][field] = {};
+                                }
+                                if (fullData['y2'][field][num] == undefined) {
+                                    fullData['y2'][field][num] = [];
+                                }
+                                fullData['y2'][field][num].push(data);
+                                if (titleMap[field] == undefined) {
+                                    titleMap[field] = title;
+                                }
+                            }
                         });
                     });
                     var chartOption = {};
                     var xData = {};
                     var yData = [];
+
                     switch (chartType) {
                         case 'pie':
                             if (that._options.chartPieType == 0) {
@@ -1050,12 +1064,17 @@
                             break;
                         default:
                             xData['data'] = [];
+                            xData['axis'] = [];
                             xData['legend'] = [];
-                            $.each(fullData['x'], function (f, d) {
+                            fullData['x'] !== undefined && $.each(fullData['x'], function (f, d) {
                                 xData['data'].push(d);
                             });
-                            $.each(fullData['y'], function (f, d) {
+                            fullData['y'] !== undefined && $.each(fullData['y'], function (f, d) {
                                 xData['legend'].push(titleMap[f]);
+                                var axis = {
+                                    type: 'value'
+                                };
+                                xData['axis'].push(axis);
                                 var dArr = [];
                                 $.each(fullData['y'][f], function (sk, sv) {
                                     dArr.push(sv[0])
@@ -1067,6 +1086,28 @@
                                 };
                                 yData.push(s);
                             });
+                            var y2Length = 0;
+                            fullData['y2'] !== undefined && $.each(fullData['y2'], function (f, d) {
+                                xData['legend'].push(titleMap[f]);
+                                var dArr = [];
+                                $.each(fullData['y2'][f], function (sk, sv) {
+                                    dArr.push(sv[0])
+                                });
+                                var s = {
+                                    name: titleMap[f],
+                                    type: (that._options.chartY2Type == undefined ? 'line' : that._options.chartY2Type),
+                                    yAxisIndex: 1,
+                                    data: dArr
+                                };
+                                yData.push(s);
+                                y2Length++;
+                            });
+                            if (y2Length > 0) {
+                                var axis = {
+                                    type: 'value'
+                                };
+                                xData['axis'].push(axis);
+                            }
                             chartOption = getBarOrLineChartOption(xData, yData);
                     }
                     if (xData['data'].length == 0)
@@ -1418,7 +1459,7 @@
                         td.css("cursor", "pointer");
                         td.css("color", "red");
                         td.on("click", function () {
-                            column.dataClick(num, current_data);
+                            column.dataClick(num, grid);
                         })
                     }
                 });
@@ -1724,7 +1765,7 @@
             this.$gridWrapper.find('th.sorting').on("click", function () {
                 var field = $(this).data("field");
                 that._reload({
-                    sort: field + "_asc"
+                    sort: field + "_desc"
                 });
             });
             this.$gridWrapper.find('th.sorting_asc').on("click", function () {
