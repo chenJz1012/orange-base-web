@@ -60,7 +60,7 @@
                 }, {
                     title: "菜单数",
                     field: "functionCount",
-                    chartY: true
+                    chartY2: true
                 }
             ]
         };
