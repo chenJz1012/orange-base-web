@@ -237,7 +237,7 @@
             });
         },
         enterSubFolder: function (subFolderName) {
-            this.manager.enterFolder(this.currentPath + subFolderName)
+            this.manager.enterFolder(this.currentPath + subFolderName);
         },
         returnParent: function () {
             this.manager.enterFolder(this.parentPath);
