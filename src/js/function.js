@@ -176,7 +176,6 @@
     function initVerticalMenu() {
         var ul = "#vertical-menu";
         $("#side-menu-div").remove();
-        $(".page-wrapper").removeClass("side-page");
         $.ajax(
             {
                 type: 'GET',
