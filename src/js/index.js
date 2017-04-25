@@ -18,16 +18,11 @@
         page: function (title) {
             App.content.empty()
             App.title(title)
-            var content = $('<div class="panel-body" >' +
+            var content = $(
+                '<div class="panel-body" >' +
                 '<div class="row">' +
-                '<div class="col-md-12">' +
-                '<div class="panel panel-default">' +
-                '<div class="panel-heading">' +
-                '<i class="fa fa-bar-chart-o fa-fw"></i>用户分布' +
-                '</div>' +
-                '<div class="panel-body" id="index_grid"></div>' +
-                '</div>'+
-                '</div>'+
+                '<div class="col-md-12" id="index_grid">' +
+
                 '</div> ' +
                 '</div> ' +
                 '</div>')
