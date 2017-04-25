@@ -113,7 +113,7 @@
     function initSideMenu() {
         var ul = "#side-menu";
         $("ul[role=vertical]").remove();
-        $(".page-wrapper").removeClass("side-page");
+        $(".page-wrapper").addClass("side-page");
         $.ajax(
             {
                 type: 'GET',
@@ -175,7 +175,7 @@
 
     function initVerticalMenu() {
         var ul = "#vertical-menu";
-        $("ul[role=side]").remove();
+        $("ul[role='side']").remove();
         $(".page-wrapper").removeClass("side-page");
         $.ajax(
             {
