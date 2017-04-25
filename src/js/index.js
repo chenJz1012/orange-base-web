@@ -16,24 +16,21 @@
 
     App.index = {
         page: function (title) {
-            App.content.empty();
-            console.info(1);
-            App.title(title);
-            console.info(2);
+            App.content.empty()
+            App.title(title)
             var content = $('<div class="panel-body" >' +
                 '<div class="row">' +
                 '<div class="col-md-12" id="index_grid"></div> ' +
                 '</div> ' +
-                '</div>');
-            App.content.append(content);
-            console.info(3);
-            initEvents();
+                '</div>')
+            App.content.append(content)
+            App.index.initEvents()
         }
     };
     /**
      * 初始化事件
      */
-    var initEvents = function () {
+    App.index.initEvents = function () {
         var gridOptions = {
             url: App.href + "/api/sys/role/roleUserCount",
             contentType: "chart-bar",
