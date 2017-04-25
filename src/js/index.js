@@ -21,9 +21,9 @@
             var content = $(
                 '<div class="panel panel-default">' +
                 '<div class="panel-heading">' +
-                '<i class="fa fa-bar-chart-o fa-fw"></i>用户分布' +
+                '用户分布' +
                 '</div>' +
-                '<div class="panel-body" id="news_grid"></div>' +
+                '<div class="panel-body" id="index_grid"></div>' +
                 '</div>'+
                 '</div>'
             )
