@@ -114,7 +114,6 @@
         var ul = "#side-menu";
         $("#side-menu-div").show();
         $("ul[role=vertical]").remove();
-        $(".page-wrapper").addClass("side-page");
         $.ajax(
             {
                 type: 'GET',
@@ -177,6 +176,7 @@
     function initVerticalMenu() {
         var ul = "#vertical-menu";
         $("#side-menu-div").remove();
+        $(".page-wrapper").addClass("side-page");
         $.ajax(
             {
                 type: 'GET',
