@@ -112,6 +112,7 @@
 
     function initSideMenu() {
         var ul = "#side-menu";
+        $("#side-menu-div").show();
         $("ul[role=vertical]").remove();
         $(".page-wrapper").addClass("side-page");
         $.ajax(
