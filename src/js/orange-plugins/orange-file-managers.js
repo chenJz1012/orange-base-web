@@ -1,10 +1,8 @@
 /**
  * Created by cgj on 2015/12/9.
  */
-;
 (function ($, window, document, undefined) {
     'use strict';
-
     String.prototype.startWith = function (s) {
         if (s === null || s === "" || this.length == 0 || s.length > this.length)
             return false;
