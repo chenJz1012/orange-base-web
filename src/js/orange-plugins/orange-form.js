@@ -499,6 +499,7 @@
                         itemWrapper.remove();
                     });
                     ele.find('[role=ele]').append(itemWrapper);
+                    form._uniform();
                 });
                 var cleanBtn = $('<button class="btn btn-danger" type="button">清除</button>');
                 ele.find('[role=action]').append(cleanBtn);
