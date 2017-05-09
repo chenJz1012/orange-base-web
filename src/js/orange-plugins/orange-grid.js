@@ -1438,19 +1438,23 @@
             var div = $('<div class="catlist"></div>');
             if (that._grids != undefined && that._grids != null) {
                 if (that._grids.length == 0) {
-                    div.append('<div class="row"><div class="col-lg-12"><p class="lead" style="text-align: center;">暂无数据!</p></div></div>');
+                    div.append('<dl><dd><p style="text-align: center;">暂无数据!</p></dd></dl>');
                 }
             }
             $.each(that._grids, function (i, grid) {
                 var num = (that._pageNum - 1) * that._pageSize + i + 1;
-                var ele = $(
-                    '<div class="row">' +
-                    '<div class="col-lg-4 col-md-4 col-xs-4">' +
+                var ele = $('<dl>' +
+                    '<dt>' +
                     '<img role="img" src="../../cdn/img/128.png" alt="Product image" width="128" height="128" />' +
-                    '</div>' +
-                    '<div class="col-lg-8 col-md-8 col-xs-8" role="data"></div>' +
-                    '<div class="col-lg-12 col-md-12 col-xs-12" role="btn-g"></div>' +
-                    '</div>');
+                    '<strong><span role="cb"></span></strong>' +
+                    '<a href="javacript:void(0);" role="hd"></a>' +
+                    '</dt>' +
+                    '<dd role="data">' +
+                    '</dd>' +
+                    '<dd>' +
+                    '<div style="text-align: center" role="btn-g"></div>' +
+                    '</dd>' +
+                    '</dl>');
                 if (that._showCheck) {
                     var checkbox = $('<input type="checkbox" class="checkboxes" style="height: 18px;" value="'
                         + grid[that._idField] + '"/>');
@@ -1463,12 +1467,18 @@
                     if (column.format != undefined) {
                         html = column.format(num, grid);
                     }
+                    if (that._headField == undefined) {
+                        ele.find("a[role=hd]").text(title + ':' + grid[that._idField]);
+                    }
                     if (that._imgField != undefined && that._imgField != null && grid[that._imgField] != undefined) {
                         ele.find("img[role=img]").attr("src", grid[that._imgField]);
                     }
+                    if (column.field == that._headField) {
+                        ele.find("a[role=hd]").text(title + ':' + html);
+                    }
                     if (column.field != that._imgField && column.field != that._headField) {
-                        var div = $('<div class="row"><div class="col-lg-4"><strong>' + title + '</strong></div><div class="col-lg-8"><p style="font-size: 12px" class="lead">' + html + '</p></div></div>');
-                        ele.find("div[role=data]").append(div);
+                        var p = $('<p><label>' + title + '</label>  ' + html + '</p>');
+                        ele.find("dd[role=data]").append(p);
                     }
                 });
                 if (that._actionColumns != undefined) {
