@@ -30,6 +30,7 @@
                 '昨天': [moment().subtract(1, 'days').startOf('day'), moment().subtract(1, 'days').endOf('day')],
                 '最近七天': [moment().subtract(6, 'days'), moment()],
                 '最近三十天': [moment().subtract(29, 'days'), moment()],
+                '最近半年': [moment().subtract(6, 'month').startOf('day'), moment().endOf('day')],
                 '本月': [moment().startOf('month'), moment().endOf('month')],
                 '上月': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
             },
@@ -389,7 +390,7 @@
                         that._init();
                     } else if (data.code === 401 || data.code === 403) {
                         that.$element.unblock();
-                        that._alert(data.message + ";请重新登录！", App.redirectLogin);
+                        that._alert(data.message + ";请重新登录！", undefined, undefined, App.redirectLogin);
                     } else {
                         that.$element.unblock();
                         that._alert(data.message);
@@ -764,7 +765,7 @@
                                     $(this).prev().click();
                                 });
                             } else if (item.type == "html") {
-                                ele = item.eleHandle();
+                                ele = item.eleHandler();
                                 itemDiv.find(".form-group").append(ele);
                             }
                             searchFormRow.find(".row").append(itemDiv);
@@ -1126,7 +1127,7 @@
                     $(this).prev().click();
                 });
             } else if (item.type == "html") {
-                ele = item.eleHandle();
+                ele = item.eleHandler();
                 itemDiv.find(".form-group").append(ele);
             }
         },
@@ -2096,6 +2097,7 @@
                 this._afterInit(this);
         },
         _doSelect2: function () {
+            var that = this;
             if (this._select2 && $().select2) {
                 var selects = this.$element.find("select");
                 if (selects.size() > 0) {

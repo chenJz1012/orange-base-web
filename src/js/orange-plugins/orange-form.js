@@ -10,7 +10,10 @@
             KE = K;
         });
     }
-
+    var isArray = function (object) {
+        return object && typeof object === 'object' &&
+            Array == object.constructor;
+    }
     var getLowCaseType = function (string) {
         var postfix = string.substring(string.lastIndexOf("."), string.length);
         return postfix.toLowerCase();
@@ -126,6 +129,9 @@
                 type: method,
                 dataType: "json",
                 url: ajaxUrl,
+                beforeSend: function (request) {
+                    request.setRequestHeader("X-Auth-Token", App.token);
+                },
                 success: function (data) {
                     if (data.code === 200) {
                         this._data = data.data;
@@ -457,15 +463,49 @@
                     "attribute_": (data.attribute === undefined ? ""
                         : data.attribute)
                 });
-                if (data.eleHandle != undefined) {
-                    var p = data.eleHandle(data.handleParams);
+                if (data.eleHandler != undefined) {
+                    var p = data.eleHandler(data.handleParams);
                     ele.append(p);
                 } else {
                     ele.append(data.html);
                 }
-                if (data.loadHandle !== undefined) {
-                    ele.data("load", data.loadHandle);
+                if (data.loadHandler !== undefined) {
+                    ele.data("load", data.loadHandler);
                 }
+                return ele;
+            },
+            'list': function (data, form) {
+                var wrapper = '<div role="list" class="row" id="${id_}" name="${name_}" ${attribute_} >' +
+                    '<div role="ele" class="col-lg-12"></div>' +
+                    '<div role="action" class="col-lg-12 btn-group"></div>' +
+                    '</div>';
+                var ele = $.tmpl(wrapper, {
+                    "id_": (data.id === undefined ? data.name : data.id),
+                    "name_": data.name,
+                    "attribute_": (data.attribute === undefined ? ""
+                        : data.attribute)
+                });
+                var addBtn = $('<button class="btn btn-info" type="button">添加</button>');
+                ele.find('[role=action]').append(addBtn);
+                addBtn.on("click", function () {
+                    var itemWrapper = $('<div class="row">' +
+                        '<div role="s-ele" class="col-lg-12 form-group input-group"><span role="s-action" class="input-group-btn"></span></div>' +
+                        '</div>');
+                    var item = form._formEles[data.item.type](data.item, form);
+                    itemWrapper.find('[role=s-ele]').prepend(item);
+                    var deleteBtn = $('<button class="btn btn-danger" type="button"><i class="fa fa-times"></i></button>');
+                    itemWrapper.find('[role=s-action]').append(deleteBtn);
+                    deleteBtn.on("click", function () {
+                        itemWrapper.remove();
+                    });
+                    ele.find('[role=ele]').append(itemWrapper);
+                });
+                var cleanBtn = $('<button class="btn btn-danger" type="button">清除</button>');
+                ele.find('[role=action]').append(cleanBtn);
+                cleanBtn.on("click", function () {
+                    ele.find('[role=ele]').empty();
+                });
+                ele.data("data", data);
                 return ele;
             },
             'display': function (data, form) {
@@ -1080,6 +1120,17 @@
             this._initHtmlHandle();
         },
         _uniform: function () {
+            var that = this;
+            if (this._options.select2 && $().select2) {
+                var selects = this.$form.find("select");
+                if (selects.size() > 0) {
+                    selects.each(function () {
+                        $(this).select2({
+                            width: "100%"
+                        });
+                    });
+                }
+            }
             if (!$().uniform) {
                 return;
             }
@@ -1249,6 +1300,26 @@
                 });
             }
         },
+        _renderDivList: function (div, name, values) {
+            var that = this;
+            var data = $(div).data("data");
+            var ele = $(div);
+            var value_arr = isArray(values) ? values : values.split(',');
+            $.each(value_arr, function (i, d) {
+                var itemWrapper = $('<div class="row">' +
+                    '<div role="s-ele" class="col-lg-12 form-group input-group"><span role="s-action" class="input-group-btn"></span></div>' +
+                    '</div>');
+                var item = that._formEles[data.item.type](data.item, form);
+                that._loadValue(data.item.name, d, item);
+                itemWrapper.find('[role=s-ele]').prepend(item);
+                var deleteBtn = $('<button class="btn btn-danger" type="button"><i class="fa fa-times"></i></button>');
+                itemWrapper.find('[role=s-action]').append(deleteBtn);
+                deleteBtn.on("click", function () {
+                    itemWrapper.remove();
+                });
+                ele.find('[role=ele]').append(itemWrapper);
+            });
+        },
         _renderMultipleFiles: function (table, fieldName, fileIds) {
             var elementData = $(table).data("data");
             var template = '<tr class="template-upload fade in">'
@@ -1388,6 +1459,7 @@
                     url: that._action,
                     data: $('#' + that._formId).serialize(),
                     beforeSend: function (request) {
+                        request.setRequestHeader("X-Auth-Token", App.token);
                         if (that._beforeSend != undefined)
                             that._beforeSend(request);
                     },
@@ -1419,8 +1491,9 @@
                 this._callback();
             }
         },
-        _loadValue: function (name, value) {
-            var ele = this.$form.find("[name='" + name + "']");
+        _loadValue: function (name, value, element) {
+            var ele = element || this.$form.find("[name='" + name + "']");
+
             if (ele.is('input[type="text"]')) {
                 if (ele.attr("data-type") == "tree-input") {
                     if ($.isArray(value)) {
@@ -1544,12 +1617,14 @@
                 ele.html(value);
             } else if (ele.is('table')) {
                 this._renderMultipleFiles(ele, name, value);
+            } else if (ele.is('div[role=list]')) {
+                this._renderDivList(ele, name, value);
             } else {
                 ele.val(value);
             }
-            var loadHandle = ele.data("load");
-            if (loadHandle !== undefined) {
-                loadHandle(ele, value);
+            var loadHandler = ele.data("load");
+            if (loadHandler !== undefined) {
+                loadHandler(ele, value);
             }
             this._uniform();
         },

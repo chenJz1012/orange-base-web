@@ -3,7 +3,6 @@
  */
 
 (function ($, window, document, undefined) {
-    $.fn.modal.Constructor.prototype.enforceFocus = function () { };
     var Modal = function (options) {
         this._setVariable(options);
         this._setOptions(this._options);
