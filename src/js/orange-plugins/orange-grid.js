@@ -2090,7 +2090,6 @@
                 });
             });
             this._uniform();
-            this._doSelect2();
         },
         // 执行回调
         _doAfterInit: function () {
@@ -2109,6 +2108,7 @@
             }
         },
         _uniform: function () {
+            this._doSelect2();
             if ($().uniform) {
                 var checks = $("input[type=checkbox]:not(.toggle), input[type=radio]:not(.toggle)");
                 if (checks.size() > 0) {
