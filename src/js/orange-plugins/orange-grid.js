@@ -1445,17 +1445,11 @@
                 var num = (that._pageNum - 1) * that._pageSize + i + 1;
                 var ele = $(
                     '<div class="row">' +
-                    '<div class="col-lg-4">' +
+                    '<div class="col-lg-4 col-md-4 col-xs-4">' +
                     '<img role="img" src="../../cdn/img/128.png" alt="Product image" width="128" height="128" />' +
                     '</div>' +
-                    '<div class="col-lg-8">' +
-                    '<div class="row">' +
-                    '<div class="col-lg-12" role="data"></div>' +
-                    '</div>' +
-                    '</div>' +
-                    '<div class="row">' +
-                    '<div class="col-lg-12" role="btn-g"></div>' +
-                    '</div>' +
+                    '<div class="col-lg-8 col-md-8 col-xs-8" role="data"></div>' +
+                    '<div class="col-lg-12 col-md-12 col-xs-12" role="btn-g"></div>' +
                     '</div>');
                 if (that._showCheck) {
                     var checkbox = $('<input type="checkbox" class="checkboxes" style="height: 18px;" value="'
