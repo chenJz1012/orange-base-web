@@ -1445,7 +1445,7 @@
                 var num = (that._pageNum - 1) * that._pageSize + i + 1;
                 var ele = $('<dl>' +
                     '<dt>' +
-                    '<img role="img" src="../../cdn/img/128.png" alt="Product image" width="128" height="128" />' +
+                    '<img role="img" src="../../cdn/img/128.png" alt="Product image" width="64" height="64" />' +
                     '<strong><span role="cb"></span></strong>' +
                     '<a href="javacript:void(0);" role="hd"></a>' +
                     '</dt>' +
@@ -1477,8 +1477,8 @@
                         ele.find("a[role=hd]").text(title + ':' + html);
                     }
                     if (column.field != that._imgField && column.field != that._headField) {
-                        var p = $('<p><label>' + title + '</label>  ' + html + '</p>');
-                        ele.find("dd[role=data]").append(p);
+                        var div = $('<div class="row"><div class="col-lg-4"><strong>' + title + '</strong></div><div class="col-lg-8">' + html + '</div></div>');
+                        ele.find("dd[role=data]").append(div);
                     }
                 });
                 if (that._actionColumns != undefined) {
