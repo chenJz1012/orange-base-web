@@ -1452,7 +1452,7 @@
                     '<dd role="data">' +
                     '</dd>' +
                     '<dd>' +
-                    '<div style="text-align: center" role="btn-g"></div>' +
+                    '<div class="pull-right" role="btn-g"></div>' +
                     '</dd>' +
                     '</dl>');
                 if (that._showCheck) {
@@ -1477,7 +1477,7 @@
                         ele.find("a[role=hd]").text(title + ':' + html);
                     }
                     if (column.field != that._imgField && column.field != that._headField) {
-                        var div = $('<div class="row"><div class="col-lg-4"><strong>' + title + '</strong></div><div class="col-lg-8">' + html + '</div></div>');
+                        var div = $('<div class="row"><div class="col-lg-4"><strong>' + title + '</strong></div><div class="col-lg-8"><p style="font-size: 12px" class="lead">' + html + '</p></div></div>');
                         ele.find("dd[role=data]").append(div);
                     }
                 });
