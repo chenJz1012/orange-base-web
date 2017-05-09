@@ -126,9 +126,6 @@
                 type: method,
                 dataType: "json",
                 url: ajaxUrl,
-                beforeSend: function (request) {
-                    request.setRequestHeader("X-Auth-Token", App.token);
-                },
                 success: function (data) {
                     if (data.code === 200) {
                         this._data = data.data;
@@ -221,7 +218,7 @@
         },
         _init: function () {
             this._renderEles();
-            this._regiestEvents();
+            this._registerEvents();
             this._doCallbacks();
         },
         _renderEles: function () {
@@ -1073,7 +1070,7 @@
                 return ele;
             }
         },
-        _regiestEvents: function () {
+        _registerEvents: function () {
             this._uniform();
             this._initSubmit();
             this._initShowIconText();
@@ -1391,7 +1388,6 @@
                     url: that._action,
                     data: $('#' + that._formId).serialize(),
                     beforeSend: function (request) {
-                        request.setRequestHeader("X-Auth-Token", App.token);
                         if (that._beforeSend != undefined)
                             that._beforeSend(request);
                     },

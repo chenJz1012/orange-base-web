@@ -212,9 +212,6 @@
                 type: "POST",
                 dataType: "json",
                 url: that.manager.options.url.folder,
-                beforeSend: function (request) {
-                    request.setRequestHeader("X-Auth-Token", App.token);
-                },
                 data: {
                     "path": this.currentPath
                 },
@@ -477,9 +474,6 @@
                 type: "POST",
                 dataType: "json",
                 url: that.folder.manager.options.url.createFolder,
-                beforeSend: function (request) {
-                    request.setRequestHeader("X-Auth-Token", App.token);
-                },
                 data: {
                     "dirPath": dirPath
                 },
@@ -513,9 +507,6 @@
                 type: "POST",
                 dataType: "json",
                 url: that.folder.manager.options.url.rename,
-                beforeSend: function (request) {
-                    request.setRequestHeader("X-Auth-Token", App.token);
-                },
                 data: {
                     "folderPath": folderPath,
                     "oldName": oldName,
@@ -543,9 +534,6 @@
                 type: "POST",
                 dataType: "json",
                 url: that.folder.manager.options.url.deleteFile,
-                beforeSend: function (request) {
-                    request.setRequestHeader("X-Auth-Token", App.token);
-                },
                 data: {
                     "filePath": filePath
                 },
@@ -569,9 +557,6 @@
                 type: "POST",
                 dataType: "json",
                 url: that.folder.manager.options.url.deleteFolder,
-                beforeSend: function (request) {
-                    request.setRequestHeader("X-Auth-Token", App.token);
-                },
                 data: {
                     "dirPath": dirPath
                 },
@@ -596,9 +581,6 @@
                 type: "POST",
                 dataType: "json",
                 url: that.folder.manager.options.url.unCompress,
-                beforeSend: function (request) {
-                    request.setRequestHeader("X-Auth-Token", App.token);
-                },
                 data: {
                     "folderPath": folderPath,
                     "name": that.name
