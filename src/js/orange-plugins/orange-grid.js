@@ -410,6 +410,7 @@
         },
         _initEmpty: function () {
             this._renderEles();
+            this._uniform();
         },
         // 初始化
         _init: function () {
